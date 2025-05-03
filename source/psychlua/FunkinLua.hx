@@ -1491,7 +1491,7 @@ class FunkinLua {
 		#end
 		//
 
-		Lua_helper.add_callback(lua, "debugPrint", function(text:Dynamic = '', color:String = 'WHITE') PlayState.instance.addTextToDebug(text, CoolUtil.colorFromString(color)));
+		Lua_helper.add_callback(lua, "debugPrint", function(text:Dynamic = '', color:String = 'WHITE') MusicBeatState.addTextToDebug(text, CoolUtil.colorFromString(color)));
 
 		addLocalCallback("close", function() {
 			closed = true;
@@ -1631,7 +1631,7 @@ class FunkinLua {
 			if(deprecated && !getBool('luaDeprecatedWarnings')) {
 				return;
 			}
-			PlayState.instance.addTextToDebug(text, color);
+			MusicBeatState.addTextToDebug(text, color);
 		}
 	}
 

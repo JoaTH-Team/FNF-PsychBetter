@@ -12,41 +12,101 @@ import substates.ResetScoreSubState;
 
 import flixel.math.FlxMath;
 
+#if HSCRIPT_ALLOWED
+import psychlua.LuaUtils;
+import psychlua.HScript;
+import psychlua.HScript.HScriptInfos;
+import crowplexus.iris.Iris;
+import crowplexus.hscript.Expr.Error as IrisError;
+import crowplexus.hscript.Printer;
+#end
+
 class FreeplayState extends MusicBeatState
 {
-	var songs:Array<SongMetadata> = [];
+	public var songs:Array<SongMetadata> = [];
 
-	var selector:FlxText;
+	public var selector:FlxText;
 	private static var curSelected:Int = 0;
-	var lerpSelected:Float = 0;
-	var curDifficulty:Int = -1;
+	public var lerpSelected:Float = 0;
+	public var curDifficulty:Int = -1;
 	private static var lastDifficultyName:String = Difficulty.getDefault();
 
-	var scoreBG:FlxSprite;
-	var scoreText:FlxText;
-	var diffText:FlxText;
-	var lerpScore:Int = 0;
-	var lerpRating:Float = 0;
-	var intendedScore:Int = 0;
-	var intendedRating:Float = 0;
+	public var scoreBG:FlxSprite;
+	public var scoreText:FlxText;
+	public var diffText:FlxText;
+	public var lerpScore:Int = 0;
+	public var lerpRating:Float = 0;
+	public var intendedScore:Int = 0;
+	public var intendedRating:Float = 0;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
-	private var curPlaying:Bool = false;
+	public var curPlaying:Bool = false;
 
-	private var iconArray:Array<HealthIcon> = [];
+	public var iconArray:Array<HealthIcon> = [];
 
-	var bg:FlxSprite;
-	var intendedColor:Int;
-	var colorTween:FlxTween;
+	public var bg:FlxSprite;
+	public var intendedColor:Int;
+	public var colorTween:FlxTween;
 
-	var missingTextBG:FlxSprite;
-	var missingText:FlxText;
+	public var missingTextBG:FlxSprite;
+	public var missingText:FlxText;
 
-	var bottomString:String;
-	var bottomText:FlxText;
-	var bottomBG:FlxSprite;
+	public var bottomString:String;
+	public var bottomText:FlxText;
+	public var bottomBG:FlxSprite;
 
-	var player:MusicPlayer;
+	public var player:MusicPlayer;
+
+	public static var instance:FreeplayState = null;
+
+	#if HSCRIPT_ALLOWED
+	var hscript:HScript;
+	public function startedHScripts(scriptFile:String)
+	{
+		#if MODS_ALLOWED
+		var scriptToLoad:String = Paths.modFolders(scriptFile);
+		if(!FileSystem.exists(scriptToLoad))
+			scriptToLoad = Paths.getSharedPath(scriptFile);
+		#else
+		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
+		#end
+
+		if(FileSystem.exists(scriptToLoad))
+		{
+			initHScript(scriptToLoad);
+			return true;
+		}
+		return false;
+	}
+
+	public function initHScript(file:String)
+	{
+		try
+		{
+			hscript = new HScript(null, file);
+			hscript.execute();
+			if (hscript.exists('onCreate')) hscript.call('onCreate');
+			trace('initialized hscript interp successfully: $file');
+		}
+		catch(e:IrisError)
+		{
+			var pos:HScriptInfos = cast {fileName: file, showLine: false};
+			Iris.error(Printer.errorToString(e, false), pos);
+			if(hscript != null)
+				hscript.destroy();
+		}
+	}
+
+	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null) {
+		#if HSCRIPT_ALLOWED
+		if(hscript != null)
+		{
+			if (hscript.exists(funcToCall))
+				hscript.executeFunction(funcToCall, args);
+		}
+		#end
+	}
+	#end
 
 	override function create()
 	{
@@ -60,6 +120,12 @@ class FreeplayState extends MusicBeatState
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
+		#end
+
+		instance = this;
+		#if HSCRIPT_ALLOWED
+		startedHScripts("states/FreeplayState.hx");
+		callOnScripts("onCreate", []);
 		#end
 
 		for (i in 0...WeekData.weeksList.length) {
@@ -137,7 +203,6 @@ class FreeplayState extends MusicBeatState
 
 		add(scoreText);
 
-
 		missingTextBG = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		missingTextBG.alpha = 0.6;
 		missingTextBG.visible = false;
@@ -174,6 +239,16 @@ class FreeplayState extends MusicBeatState
 		changeSelection();
 		updateTexts();
 		super.create();
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onCreatePost", []);
+		#end
+
+		#if HSCRIPT_ALLOWED
+		if (hscript != null) {
+			hscript.set("game", MusicBeatState.getState());
+		}
+		#end
 	}
 
 	override function closeSubState() {
@@ -201,6 +276,11 @@ class FreeplayState extends MusicBeatState
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		}
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onUpdate", [elapsed]);
+		#end
+
 		lerpScore = Math.floor(FlxMath.lerp(intendedScore, lerpScore, Math.exp(-elapsed * 24)));
 		lerpRating = FlxMath.lerp(intendedRating, lerpRating, Math.exp(-elapsed * 12));
 
@@ -413,6 +493,10 @@ class FreeplayState extends MusicBeatState
 
 		updateTexts(elapsed);
 		super.update(elapsed);
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onUpdatePost", [elapsed]);
+		#end
 	}
 
 	public static function destroyFreeplayVocals() {
@@ -565,7 +649,39 @@ class FreeplayState extends MusicBeatState
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 		if (!FlxG.sound.music.playing)
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+
+		#if HSCRIPT_ALLOWED
+		if (hscript != null) {
+			hscript.call('onDestroy');
+			hscript.destroy();
+		}
+		#end
 	}	
+
+	override function beatHit() {
+		super.beatHit();
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onBeatHit", []);
+		if (hscript != null) {
+			hscript.set("curBeat", curBeat);
+			hscript.set("curDecBeat", curDecBeat);
+		}
+		#end
+
+		instance = null;
+	}
+
+	override function stepHit() {
+		super.stepHit();
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onStepHit", []);
+		if (hscript != null) {
+			hscript.set("curStep", curStep);
+		}
+		#end
+	}
 }
 
 class SongMetadata

@@ -2,24 +2,93 @@ package states;
 
 import objects.AttachedSprite;
 
+#if HSCRIPT_ALLOWED
+import psychlua.LuaUtils;
+import psychlua.HScript;
+import psychlua.HScript.HScriptInfos;
+import crowplexus.iris.Iris;
+import crowplexus.hscript.Expr.Error as IrisError;
+import crowplexus.hscript.Printer;
+#end
+
 class CreditsState extends MusicBeatState
 {
-	var curSelected:Int = -1;
+	public var curSelected:Int = -1;
 
-	private var grpOptions:FlxTypedGroup<Alphabet>;
-	private var iconArray:Array<AttachedSprite> = [];
-	private var creditsStuff:Array<Array<String>> = [];
+	public var grpOptions:FlxTypedGroup<Alphabet>;
+	public var iconArray:Array<AttachedSprite> = [];
+	public var creditsStuff:Array<Array<String>> = [];
 
-	var bg:FlxSprite;
-	var descText:FlxText;
-	var intendedColor:FlxColor;
-	var colorTween:FlxTween;
-	var descBox:AttachedSprite;
+	public var bg:FlxSprite;
+	public var descText:FlxText;
+	public var intendedColor:FlxColor;
+	public var colorTween:FlxTween;
+	public var descBox:AttachedSprite;
 
 	var offsetThing:Float = -75;
 
-	override function create()
+	public static var instance:CreditsState = null;
+
+	#if HSCRIPT_ALLOWED
+	var hscript:HScript;
+	public function startedHScripts(scriptFile:String)
 	{
+		#if MODS_ALLOWED
+		var scriptToLoad:String = Paths.modFolders(scriptFile);
+		if(!FileSystem.exists(scriptToLoad))
+			scriptToLoad = Paths.getSharedPath(scriptFile);
+		#else
+		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
+		#end
+
+		if(FileSystem.exists(scriptToLoad))
+		{
+			initHScript(scriptToLoad);
+			return true;
+		}
+		return false;
+	}
+
+	public function initHScript(file:String)
+	{
+		try
+		{
+			hscript = new HScript(null, file);
+			hscript.execute();
+			if (hscript.exists('onCreate')) hscript.call('onCreate');
+			trace('initialized hscript interp successfully: $file');
+		}
+		catch(e:IrisError)
+		{
+			var pos:HScriptInfos = cast {fileName: file, showLine: false};
+			Iris.error(Printer.errorToString(e, false), pos);
+			if(hscript != null)
+				hscript.destroy();
+		}
+	}
+
+	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null) {
+		#if HSCRIPT_ALLOWED
+		if(hscript != null)
+		{
+			if (hscript.exists(funcToCall))
+				hscript.executeFunction(funcToCall, args);
+		}
+		#end
+	}
+	#end
+
+	public var defaultList:Array<Array<String>>;
+
+	override public function create()
+	{
+		instance = this;
+
+		#if HSCRIPT_ALLOWED
+		startedHScripts("states/CreditsState.hx");
+		callOnScripts("onCreate", []);
+		#end
+
 		#if DISCORD_ALLOWED
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
@@ -38,7 +107,7 @@ class CreditsState extends MusicBeatState
 		for (mod in Mods.parseList().enabled) pushModCreditsToList(mod);
 		#end
 
-		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
+		defaultList = [ //Name - Icon name - Description - Link - BG Color
 			['Psych Engine Team'],
 			['Shadow Mario',		'shadowmario',		'Main Programmer and Head of Psych Engine',					 'https://ko-fi.com/shadowmario',		'444444'],
 			['Riveren',				'riveren',			'Main Artist/Animator of Psych Engine',						 'https://twitter.com/riverennn',		'14967B'],
@@ -127,16 +196,30 @@ class CreditsState extends MusicBeatState
 		intendedColor = bg.color;
 		changeSelection();
 		super.create();
+	
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onCreatePost", []);
+		#end
+
+		#if HSCRIPT_ALLOWED
+		if (hscript != null) {
+			hscript.set("game", MusicBeatState.getState());
+		}
+		#end
 	}
 
-	var quitting:Bool = false;
-	var holdTime:Float = 0;
+	public var quitting:Bool = false;
+	public var holdTime:Float = 0;
 	override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music.volume < 0.7)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		}
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onUpdate", [elapsed]);
+		#end
 
 		if(!quitting)
 		{
@@ -204,9 +287,13 @@ class CreditsState extends MusicBeatState
 			}
 		}
 		super.update(elapsed);
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onUpdatePost", [elapsed]);
+		#end
 	}
 
-	var moveTween:FlxTween = null;
+	public var moveTween:FlxTween = null;
 	function changeSelection(change:Int = 0)
 	{
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
@@ -255,6 +342,13 @@ class CreditsState extends MusicBeatState
 
 		descBox.setGraphicSize(Std.int(descText.width + 20), Std.int(descText.height + 25));
 		descBox.updateHitbox();
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onChangeSelection", []);
+		if (hscript != null) {
+			hscript.set("curSelected", curSelected);
+		}
+		#end
 	}
 
 	#if MODS_ALLOWED
@@ -278,7 +372,46 @@ class CreditsState extends MusicBeatState
 	}
 	#end
 
-	private function unselectableCheck(num:Int):Bool {
+	public function unselectableCheck(num:Int):Bool {
 		return creditsStuff[num].length <= 1;
 	}
+
+	override function beatHit() {
+		super.beatHit();
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onBeatHit", []);
+		if (hscript != null) {
+			hscript.set("curBeat", curBeat);
+			hscript.set("curDecBeat", curDecBeat);
+		}
+		#end
+	}
+
+	override function stepHit() {
+		super.stepHit();
+
+		#if HSCRIPT_ALLOWED
+		callOnScripts("onStepHit", []);
+		if (hscript != null) {
+			hscript.set("curStep", curStep);
+		}
+		#end
+	}
+
+	override function destroy():Void
+	{
+		super.destroy();
+
+		FlxG.autoPause = ClientPrefs.data.autoPause;
+		if (!FlxG.sound.music.playing)
+			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+
+		#if HSCRIPT_ALLOWED
+		if (hscript != null) {
+			hscript.call('onDestroy');
+			hscript.destroy();
+		}
+		#end
+	}	
 }

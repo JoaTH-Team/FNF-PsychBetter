@@ -10,7 +10,7 @@ import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.gamepad.FlxGamepadManager;
 
-class ControlsSubState extends MusicBeatSubstate
+class ControlsSubState extends MusicBeatSubState
 {
 	var curSelected:Int = 0;
 	var curAlt:Bool = false;

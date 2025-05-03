@@ -9,7 +9,7 @@ import flixel.FlxSubState;
 import states.StoryMenuState;
 import states.FreeplayState;
 
-class GameOverSubstate extends MusicBeatSubstate
+class GameOverSubstate extends MusicBeatSubState
 {
 	public var boyfriend:Character;
 	var camFollow:FlxObject;

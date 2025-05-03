@@ -251,7 +251,7 @@ class AchievementsMenuState extends MusicBeatState
 	}
 }
 
-class ResetAchievementSubstate extends MusicBeatSubstate
+class ResetAchievementSubstate extends MusicBeatSubState
 {
 	var onYes:Bool = false;
 	var yesText:Alphabet;

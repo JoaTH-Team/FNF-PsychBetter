@@ -18,7 +18,7 @@ import haxe.Json;
 import objects.Character;
 import openfl.utils.Assets as OpenFlAssets;
 
-class EditorPlayState extends MusicBeatSubstate
+class EditorPlayState extends MusicBeatSubState
 {
 	// Borrowed from original PlayState
 	var finishTimer:FlxTimer = null;

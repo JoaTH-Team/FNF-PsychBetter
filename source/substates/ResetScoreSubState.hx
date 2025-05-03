@@ -6,7 +6,7 @@ import backend.Highscore;
 import flixel.FlxSubState;
 import objects.HealthIcon;
 
-class ResetScoreSubState extends MusicBeatSubstate
+class ResetScoreSubState extends MusicBeatSubState
 {
 	var bg:FlxSprite;
 	var alphabetArray:Array<Alphabet> = [];

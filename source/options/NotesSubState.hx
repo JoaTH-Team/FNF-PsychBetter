@@ -13,7 +13,7 @@ import objects.Note;
 import shaders.RGBPalette;
 import shaders.RGBPalette.RGBShaderReference;
 
-class NotesSubState extends MusicBeatSubstate
+class NotesSubState extends MusicBeatSubState
 {
 	var onModeColumn:Bool = true;
 	var curSelectedMode:Int = 0;

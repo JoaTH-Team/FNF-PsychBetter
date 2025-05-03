@@ -45,9 +45,9 @@ class LuaUtils
 		if(splitProps.length > 1)
 		{
 			var target:Dynamic = null;
-			if(PlayState.instance.variables.exists(splitProps[0]))
+			if(MusicBeatState.instanceMusic.variables.exists(splitProps[0]))
 			{
-				var retVal:Dynamic = PlayState.instance.variables.get(splitProps[0]);
+				var retVal:Dynamic = MusicBeatState.instanceMusic.variables.get(splitProps[0]);
 				if(retVal != null)
 					target = retVal;
 			}
@@ -71,9 +71,9 @@ class LuaUtils
 			return value;
 		}
 
-		if(PlayState.instance.variables.exists(variable))
+		if(MusicBeatState.instanceMusic.variables.exists(variable))
 		{
-			PlayState.instance.variables.set(variable, value);
+			MusicBeatState.instanceMusic.variables.set(variable, value);
 			return value;
 		}
 		Reflect.setProperty(instance, variable, value);
@@ -85,9 +85,9 @@ class LuaUtils
 		if(splitProps.length > 1)
 		{
 			var target:Dynamic = null;
-			if(PlayState.instance.variables.exists(splitProps[0]))
+			if(MusicBeatState.instanceMusic.variables.exists(splitProps[0]))
 			{
-				var retVal:Dynamic = PlayState.instance.variables.get(splitProps[0]);
+				var retVal:Dynamic = MusicBeatState.instanceMusic.variables.get(splitProps[0]);
 				if(retVal != null)
 					target = retVal;
 			}
@@ -108,9 +108,9 @@ class LuaUtils
 			return instance.get(variable);
 		}
 
-		if(PlayState.instance.variables.exists(variable))
+		if(MusicBeatState.instanceMusic.variables.exists(variable))
 		{
-			var retVal:Dynamic = PlayState.instance.variables.get(variable);
+			var retVal:Dynamic = MusicBeatState.instanceMusic.variables.get(variable);
 			if(retVal != null)
 				return retVal;
 		}
@@ -249,7 +249,7 @@ class LuaUtils
 				return PlayState.instance;
 			
 			default:
-				var obj:Dynamic = PlayState.instance.getLuaObject(objectName, checkForTextsToo);
+				var obj:Dynamic = MusicBeatState.instanceMusic.getLuaObject(objectName, checkForTextsToo);
 				if(obj == null) obj = getVarInArray(getTargetInstance(), objectName, allowMaps);
 				return obj;
 		}
@@ -257,7 +257,7 @@ class LuaUtils
 
 	inline public static function getTextObject(name:String):FlxText
 	{
-		return #if LUA_ALLOWED PlayState.instance.modchartTexts.exists(name) ? PlayState.instance.modchartTexts.get(name) : #end Reflect.getProperty(PlayState.instance, name);
+		return #if LUA_ALLOWED MusicBeatState.instanceMusic.modchartTexts.exists(name) ? MusicBeatState.instanceMusic.modchartTexts.get(name) : #end Reflect.getProperty(PlayState.instance, name);
 	}
 	
 	public static function isOfTypes(value:Any, types:Array<Dynamic>)
@@ -344,40 +344,54 @@ class LuaUtils
 		}
 	}
 
-	public static function resetTextTag(tag:String) {
+	public static function resetCameraTag(tag:String) {
 		#if LUA_ALLOWED
-		if(!PlayState.instance.modchartTexts.exists(tag)) {
+		if(!MusicBeatState.instanceMusic.modchartCameras.exists(tag)) {
 			return;
 		}
 
-		var target:FlxText = PlayState.instance.modchartTexts.get(tag);
+		var target:FlxCamera = MusicBeatState.instanceMusic.modchartCameras.get(tag);
 		target.kill();
-		PlayState.instance.remove(target, true);
+		MusicBeatState.instanceMusic.remove(target, true);
 		target.destroy();
-		PlayState.instance.modchartTexts.remove(tag);
+		MusicBeatState.instanceMusic.modchartCameras.remove(tag);
+		#end
+	}
+
+	public static function resetTextTag(tag:String) {
+		#if LUA_ALLOWED
+		if(!MusicBeatState.instanceMusic.modchartTexts.exists(tag)) {
+			return;
+		}
+
+		var target:FlxText = MusicBeatState.instanceMusic.modchartTexts.get(tag);
+		target.kill();
+		MusicBeatState.instanceMusic.remove(target, true);
+		target.destroy();
+		MusicBeatState.instanceMusic.modchartTexts.remove(tag);
 		#end
 	}
 
 	public static function resetSpriteTag(tag:String) {
 		#if LUA_ALLOWED
-		if(!PlayState.instance.modchartSprites.exists(tag)) {
+		if(!MusicBeatState.instanceMusic.modchartSprites.exists(tag)) {
 			return;
 		}
 
-		var target:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
+		var target:ModchartSprite = MusicBeatState.instanceMusic.modchartSprites.get(tag);
 		target.kill();
-		PlayState.instance.remove(target, true);
+		MusicBeatState.instanceMusic.remove(target, true);
 		target.destroy();
-		PlayState.instance.modchartSprites.remove(tag);
+		MusicBeatState.instanceMusic.modchartSprites.remove(tag);
 		#end
 	}
 
 	public static function cancelTween(tag:String) {
 		#if LUA_ALLOWED
-		if(PlayState.instance.modchartTweens.exists(tag)) {
-			PlayState.instance.modchartTweens.get(tag).cancel();
-			PlayState.instance.modchartTweens.get(tag).destroy();
-			PlayState.instance.modchartTweens.remove(tag);
+		if(MusicBeatState.instanceMusic.modchartTweens.exists(tag)) {
+			MusicBeatState.instanceMusic.modchartTweens.get(tag).cancel();
+			MusicBeatState.instanceMusic.modchartTweens.get(tag).destroy();
+			MusicBeatState.instanceMusic.modchartTweens.remove(tag);
 		}
 		#end
 	}
@@ -392,11 +406,11 @@ class LuaUtils
 
 	public static function cancelTimer(tag:String) {
 		#if LUA_ALLOWED
-		if(PlayState.instance.modchartTimers.exists(tag)) {
-			var theTimer:FlxTimer = PlayState.instance.modchartTimers.get(tag);
+		if(MusicBeatState.instanceMusic.modchartTimers.exists(tag)) {
+			var theTimer:FlxTimer = MusicBeatState.instanceMusic.modchartTimers.get(tag);
 			theTimer.cancel();
 			theTimer.destroy();
-			PlayState.instance.modchartTimers.remove(tag);
+			MusicBeatState.instanceMusic.modchartTimers.remove(tag);
 		}
 		#end
 	}

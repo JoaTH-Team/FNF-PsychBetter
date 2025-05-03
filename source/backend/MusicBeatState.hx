@@ -1,5 +1,7 @@
 package backend;
 
+import flixel.util.FlxSave;
+import psychlua.ModchartSprite;
 import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
@@ -21,9 +23,32 @@ class MusicBeatState extends FlxUIState
 		return Controls.instance;
 	}
 
+	public static var instanceMusic:MusicBeatState = null;
+	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
+
+	public function getLuaObject(tag:String, text:Bool=true):FlxSprite {
+		#if LUA_ALLOWED
+		if(modchartSprites.exists(tag)) return modchartSprites.get(tag);
+		if(text && modchartTexts.exists(tag)) return modchartTexts.get(tag);
+		if(variables.exists(tag)) return variables.get(tag);
+		#end
+		return null;
+	}
+
 	var _psychCameraInitialized:Bool = false;
 
+	#if LUA_ALLOWED
+	public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
+	public var modchartSprites:Map<String, ModchartSprite> = new Map<String, ModchartSprite>();
+	public var modchartCameras:Map<String, FlxCamera> = new Map<String, FlxCamera>();
+	public var modchartTimers:Map<String, FlxTimer> = new Map<String, FlxTimer>();
+	public var modchartSounds:Map<String, FlxSound> = new Map<String, FlxSound>();
+	public var modchartTexts:Map<String, FlxText> = new Map<String, FlxText>();
+	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
+	#end
+
 	override function create() {
+		instanceMusic = this;
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED Mods.updatedOnState = false; #end
 

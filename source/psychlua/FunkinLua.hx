@@ -1205,27 +1205,7 @@ class FunkinLua {
 				right_color = CoolUtil.colorFromString(right);
 			game.timeBar.setColors(left_color, right_color);
 		});
-
-		Lua_helper.add_callback(lua, "setObjectCamera", function(obj:String, camera:String = '') {
-			var real = game.getLuaObject(obj);
-			if(real!=null){
-				real.cameras = [LuaUtils.cameraFromString(camera)];
-				return true;
-			}
-
-			var split:Array<String> = obj.split('.');
-			var object:FlxSprite = LuaUtils.getObjectDirectly(split[0]);
-			if(split.length > 1) {
-				object = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length-1]);
-			}
-
-			if(object != null) {
-				object.cameras = [LuaUtils.cameraFromString(camera)];
-				return true;
-			}
-			luaTrace("setObjectCamera: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
-			return false;
-		});
+		
 		Lua_helper.add_callback(lua, "setBlendMode", function(obj:String, blend:String = '') {
 			var real = game.getLuaObject(obj);
 			if(real != null) {

@@ -64,8 +64,6 @@ class TitleState extends MusicBeatState
 
 		if(FileSystem.exists(scriptToLoad))
 		{
-			if (Iris.instances.exists(scriptToLoad)) return false;
-
 			initHScript(scriptToLoad);
 			return true;
 		}
@@ -90,12 +88,14 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null):Dynamic {
-		return hscript.executeFunction(funcToCall, args);
-	}
-
-	public function setOnHScript(variable:String, arg:Dynamic) {
-		return hscript.set(variable, arg);
+	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null) {
+		#if HSCRIPT_ALLOWED
+		if(hscript != null)
+		{
+			if (hscript.exists(funcToCall))
+				hscript.executeFunction(funcToCall, args);
+		}
+		#end
 	}
 	#end
 
@@ -231,6 +231,12 @@ class TitleState extends MusicBeatState
 
 		Paths.clearUnusedMemory();
 		#if HSCRIPT_ALLOWED callOnScripts("startIntro", []); #end
+
+		#if HSCRIPT_ALLOWED
+		if (hscript != null) {
+			hscript.set("game", MusicBeatState.getState());
+		}
+		#end
 	}
 
 	function getIntroTextShit():Array<Array<String>>
@@ -401,9 +407,7 @@ class TitleState extends MusicBeatState
 			}
 		}
 	
-		#if HSCRIPT_ALLOWED 
-		setOnHScript("curBeat", curBeat);
-		setOnHScript("sickBeats", sickBeats);
+		#if HSCRIPT_ALLOWED
 		callOnScripts("onBeatHit", []); 
 		#end
 	}
@@ -412,7 +416,6 @@ class TitleState extends MusicBeatState
 		super.stepHit();
 
 		#if HSCRIPT_ALLOWED
-		setOnHScript("curStep", curStep);
 		callOnScripts("onStepHit", []); 
 		#end
 	}

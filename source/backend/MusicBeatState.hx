@@ -50,10 +50,23 @@ class MusicBeatState extends FlxUIState
 
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	private static var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
+	
+	static function initDebugGroup() {
+		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		var camForDebug:FlxCamera = new FlxCamera();
+		camForDebug.bgColor = FlxColor.TRANSPARENT;
+		FlxG.cameras.add(camForDebug, false);
+
+		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
+		luaDebugGroup.cameras = [camForDebug];
+		FlxG.state.add(luaDebugGroup);
+		#end
+	}
 	#end
 
 	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
 	public static function addTextToDebug(text:String, color:FlxColor) {
+		initDebugGroup();
 		var newText:psychlua.DebugLuaText = luaDebugGroup.recycle(psychlua.DebugLuaText);
 		newText.text = text;
 		newText.color = color;

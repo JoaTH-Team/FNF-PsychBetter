@@ -346,7 +346,7 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
+	public var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
 	public static var closedState:Bool = false;
 
 	override function beatHit()
@@ -409,6 +409,11 @@ class TitleState extends MusicBeatState
 	
 		#if HSCRIPT_ALLOWED
 		callOnScripts("onBeatHit", []); 
+		if (hscript != null) {
+			hscript.set("curBeat", curBeat);
+			hscript.set("curDecBeat", curDecBeat);
+			hscript.set("sickBeats", sickBeats);
+		}
 		#end
 	}
 
@@ -417,6 +422,9 @@ class TitleState extends MusicBeatState
 
 		#if HSCRIPT_ALLOWED
 		callOnScripts("onStepHit", []); 
+		if (hscript != null) {
+			hscript.set("curStep", curStep);
+		}
 		#end
 	}
 

@@ -9,6 +9,15 @@ import haxe.Json;
 import openfl.Assets;
 import shaders.ColorSwap;
 
+#if HSCRIPT_ALLOWED
+import psychlua.LuaUtils;
+import psychlua.HScript;
+import psychlua.HScript.HScriptInfos;
+import crowplexus.iris.Iris;
+import crowplexus.hscript.Expr.Error as IrisError;
+import crowplexus.hscript.Printer;
+#end
+
 typedef TitleData =
 {
 	titlex:Float,
@@ -25,22 +34,80 @@ class TitleState extends MusicBeatState
 {
 	public static var initialized:Bool = false;
 
-	var blackScreen:FlxSprite;
-	var credGroup:FlxGroup;
-	var credTextShit:Alphabet;
-	var textGroup:FlxGroup;
-	var ngSpr:FlxSprite;
-	
-	var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
-	var titleTextAlphas:Array<Float> = [1, .64];
+	public var blackScreen:FlxSprite;
+	public var credGroup:FlxGroup;
+	public var credTextShit:Alphabet;
+	public var textGroup:FlxGroup;
+	public var ngSpr:FlxSprite;
 
-	var curWacky:Array<String> = [];
-	var wackyImage:FlxSprite;
-	var skippedIntro:Bool = false;
-	var titleJSON:TitleData;
+	public var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
+	public var titleTextAlphas:Array<Float> = [1, .64];
+
+	public var curWacky:Array<String> = [];
+	public var wackyImage:FlxSprite;
+	public var skippedIntro:Bool = false;
+	public var titleJSON:TitleData;
+
+	public static var instance:TitleState = null;
+
+	#if HSCRIPT_ALLOWED
+	var hscript:HScript;
+	public function startedHScripts(scriptFile:String)
+	{
+		#if MODS_ALLOWED
+		var scriptToLoad:String = Paths.modFolders(scriptFile);
+		if(!FileSystem.exists(scriptToLoad))
+			scriptToLoad = Paths.getSharedPath(scriptFile);
+		#else
+		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
+		#end
+
+		if(FileSystem.exists(scriptToLoad))
+		{
+			if (Iris.instances.exists(scriptToLoad)) return false;
+
+			initHScript(scriptToLoad);
+			return true;
+		}
+		return false;
+	}
+
+	public function initHScript(file:String)
+	{
+		try
+		{
+			hscript = new HScript(null, file);
+			hscript.execute();
+			if (hscript.exists('onCreate')) hscript.call('onCreate');
+			trace('initialized hscript interp successfully: $file');
+		}
+		catch(e:IrisError)
+		{
+			var pos:HScriptInfos = cast {fileName: file, showLine: false};
+			Iris.error(Printer.errorToString(e, false), pos);
+			if(hscript != null)
+				hscript.destroy();
+		}
+	}
+
+	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null):Dynamic {
+		return hscript.executeFunction(funcToCall, args);
+	}
+
+	public function setOnHScript(variable:String, arg:Dynamic) {
+		return hscript.set(variable, arg);
+	}
+	#end
 
 	override public function create()
 	{
+		instance = this;
+
+		#if HSCRIPT_ALLOWED
+		startedHScripts("states/TitleState.hx");
+		callOnScripts("onCreate", []);
+		#end
+
 		super.create();
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
@@ -64,13 +131,15 @@ class TitleState extends MusicBeatState
 			else
 				new FlxTimer().start(1, function(tmr:FlxTimer) startIntro());
 		}
+	
+		#if HSCRIPT_ALLOWED callOnScripts("onCreatePost", []); #end
 	}
 
-	var logoBl:FlxSprite;
-	var gfDance:FlxSprite;
-	var danceLeft:Bool = false;
-	var titleText:FlxSprite;
-	var swagShader:ColorSwap = null;
+	public var logoBl:FlxSprite;
+	public var gfDance:FlxSprite;
+	public var danceLeft:Bool = false;
+	public var titleText:FlxSprite;
+	public var swagShader:ColorSwap = null;
 
 	function startIntro()
 	{
@@ -161,6 +230,7 @@ class TitleState extends MusicBeatState
 			initialized = true;
 
 		Paths.clearUnusedMemory();
+		#if HSCRIPT_ALLOWED callOnScripts("startIntro", []); #end
 	}
 
 	function getIntroTextShit():Array<Array<String>>
@@ -182,6 +252,8 @@ class TitleState extends MusicBeatState
 	{
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
+
+		#if HSCRIPT_ALLOWED callOnScripts("onUpdate", [elapsed]); #end
 
 		var pressedEnter:Bool = controls.ACCEPT;
 		if (newTitle) {
@@ -230,6 +302,8 @@ class TitleState extends MusicBeatState
 		}
 
 		super.update(elapsed);
+
+		#if HSCRIPT_ALLOWED callOnScripts("onUpdatePost", [elapsed]); #end
 	}
 
 	function createCoolText(textArray:Array<String>, ?offset:Float = 0)
@@ -326,6 +400,21 @@ class TitleState extends MusicBeatState
 					skipIntro();
 			}
 		}
+	
+		#if HSCRIPT_ALLOWED 
+		setOnHScript("curBeat", curBeat);
+		setOnHScript("sickBeats", sickBeats);
+		callOnScripts("onBeatHit", []); 
+		#end
+	}
+
+	override function stepHit() {
+		super.stepHit();
+
+		#if HSCRIPT_ALLOWED
+		setOnHScript("curStep", curStep);
+		callOnScripts("onStepHit", []); 
+		#end
 	}
 
 	function skipIntro():Void
@@ -337,5 +426,6 @@ class TitleState extends MusicBeatState
 			FlxG.camera.flash(FlxColor.WHITE, 4);
 			skippedIntro = true;
 		}
+		callOnScripts("skipIntro", []); 
 	}
 }

@@ -1,5 +1,10 @@
 package psychlua;
 
+#if !flash
+import flixel.addons.display.FlxRuntimeShader;
+import openfl.filters.ShaderFilter;
+#end
+
 #if HSCRIPT_ALLOWED
 import psychlua.HScript.HScriptInfos;
 import crowplexus.iris.Iris;
@@ -8,113 +13,112 @@ import crowplexus.hscript.Printer;
 #end
 
 class CustomState extends MusicBeatState {
-	private var game(default, set):Dynamic = PlayState.instance;
-
-	#if HSCRIPT_ALLOWED
-	public var hscript:HScript;
-	public var instancesExclude:Array<String> = [];
-	#end
-
-	#if HSCRIPT_ALLOWED
-	public function startHScriptsNamed(scriptFile:String)
-	{
-		#if MODS_ALLOWED
-		var scriptToLoad:String = Paths.modFolders(scriptFile);
-		if(!FileSystem.exists(scriptToLoad))
-			scriptToLoad = Paths.getSharedPath(scriptFile);
-		#else
-		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
-		#end
-
-		if(FileSystem.exists(scriptToLoad))
-		{
-			initHScript(scriptToLoad);
-			return true;
-		}
-		return false;
-	}
-
-	public function initHScript(file:String)
-	{
-		var newScript:HScript = null;
-		try
-		{
-			hscript = new HScript(null, file);
-			if (hscript.exists('onCreate')) hscript.call('onCreate');
-			trace('initialized hscript interp successfully: $file');
-		}
-		catch(e:IrisError)
-		{
-			var pos:HScriptInfos = cast {fileName: file, showLine: false};
-			Iris.error(Printer.errorToString(e, false), pos);
-			var hscript:HScript = cast (Iris.instances.get(file), HScript);
-			if(hscript != null)
-				hscript.destroy();
-		}
-	}
-	#end
-
-
-	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-		if(args == null) args = [];
-		if(exclusions == null) exclusions = [];
-		if(excludeValues == null) excludeValues = [LuaUtils.Function_Continue];
-
-		if(result == null || excludeValues.contains(result)) result = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
-		return result;
-	}
-
-	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
-		var returnVal:Dynamic = LuaUtils.Function_Continue;
-
-		#if HSCRIPT_ALLOWED
-		if(exclusions == null) exclusions = new Array();
-		if(excludeValues == null) excludeValues = new Array();
-		excludeValues.push(LuaUtils.Function_Continue);
-
-        @:privateAccess
-        if(hscript == null || !hscript.exists(funcToCall) || exclusions.contains(hscript.origin))
-            continue;
-
-        var callValue = hscript.call(funcToCall, args);
-        if(callValue != null)
+    #if HSCRIPT_ALLOWED
+    public var hscript:HScript;
+    public var instancesExclude:Array<String> = [];
+    #end
+    
+    #if HSCRIPT_ALLOWED
+    public function startHScriptsNamed(scriptFile:String)
+    {
+        #if MODS_ALLOWED
+        var scriptToLoad:String = Paths.modFolders(scriptFile);
+        if(!FileSystem.exists(scriptToLoad))
+            scriptToLoad = Paths.getSharedPath(scriptFile);
+        #else
+        var scriptToLoad:String = Paths.getSharedPath(scriptFile);
+        #end
+    
+        if(FileSystem.exists(scriptToLoad))
         {
-            var myValue:Dynamic = callValue.returnValue;
-
-            if((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
-            {
-                returnVal = myValue;
-                break;
-            }
-
-            if(myValue != null && !excludeValues.contains(myValue))
-                returnVal = myValue;
+            initHScript(scriptToLoad);
+            return true;
         }
-		#end
-
-		return returnVal;
-	}
-
-	public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
-		if(exclusions == null) exclusions = [];
-		setOnHScript(variable, arg, exclusions);
-	}
-
-	public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
-		#if HSCRIPT_ALLOWED
-		if(exclusions == null) exclusions = [];
-		if(exclusions.contains(hscript.origin))
-			continue;
-		if(!instancesExclude.contains(variable))
-			instancesExclude.push(variable);
-		hscript.set(variable, arg);
-		#end
-	}
+        return false;
+    }
+    
+    public function initHScript(file:String)
+    {
+        var newScript:HScript = null;
+        try
+        {
+            hscript = new HScript(null, file);
+            if (hscript.exists('onCreate')) hscript.call('onCreate');
+            trace('initialized hscript interp successfully: $file');
+        }
+        catch(e:IrisError)
+        {
+            var pos:HScriptInfos = cast {fileName: file, showLine: false};
+            Iris.error(Printer.errorToString(e, false), pos);
+            var hscript:HScript = cast (Iris.instances.get(file), HScript);
+            if(hscript != null)
+                hscript.destroy();
+        }
+    }
+    #end
+    
+    
+    public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
+        var returnVal:Dynamic = LuaUtils.Function_Continue;
+        if(args == null) args = [];
+        if(exclusions == null) exclusions = [];
+        if(excludeValues == null) excludeValues = [LuaUtils.Function_Continue];
+    
+        var result:Dynamic = null;
+        if(result == null || excludeValues.contains(result)) result = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
+        return result;
+    }
+    
+    public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
+        var returnVal:Dynamic = LuaUtils.Function_Continue;
+    
+        #if HSCRIPT_ALLOWED
+        if(exclusions == null) exclusions = new Array();
+        if(excludeValues == null) excludeValues = new Array();
+        excludeValues.push(LuaUtils.Function_Continue);
+    
+        @:privateAccess
+        if(hscript != null && hscript.exists(funcToCall)) {
+            if(!exclusions.contains(hscript.origin)) {
+                var callValue = hscript.call(funcToCall, args);
+                if(callValue != null)
+                {
+                    var myValue:Dynamic = callValue.returnValue;
+    
+                    if((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
+                    {
+                        returnVal = myValue;
+                    }
+                    else if(myValue != null && !excludeValues.contains(myValue))
+                    {
+                        returnVal = myValue;
+                    }
+                }
+            }
+        }
+        #end
+    
+        return returnVal;
+    }
+    
+    public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
+        if(exclusions == null) exclusions = [];
+        setOnHScript(variable, arg, exclusions);
+    }
+    
+    public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
+        #if HSCRIPT_ALLOWED
+        if(exclusions == null) exclusions = [];
+        if(hscript != null && !exclusions.contains(hscript.origin)) {
+            if(!instancesExclude.contains(variable))
+                instancesExclude.push(variable);
+            hscript.set(variable, arg);
+        }
+        #end
+    }
 
     public function new(file:String) {
         super();
-        this.game = MusicBeatState.getState();
 
         #if HSCRIPT_ALLOWED
         startHScriptsNamed('states/$file.hx');
@@ -123,9 +127,9 @@ class CustomState extends MusicBeatState {
 
     override function create() {
         #if HSCRIPT_ALLOWED
-        callOnHScript('onCreate', []);
+        callOnScripts('onCreate', []);
         super.create();
-        callOnHScript('onCreatePost', []);
+        callOnScripts('onCreatePost', []);
         #else
         super.create(); // prevent cannot compile
         #end
@@ -133,9 +137,9 @@ class CustomState extends MusicBeatState {
 
     override function update(elapsed:Float) {
         #if HSCRIPT_ALLOWED
-        callOnHScript('onUpdate', [elapsed]);
+        callOnScripts('onUpdate', [elapsed]);
         super.update(elapsed);
-        callOnHScript('onUpdatePost', [elapsed]);
+        callOnScripts('onUpdatePost', [elapsed]);
         #else
         super.update(elapsed);
         #end
@@ -144,7 +148,7 @@ class CustomState extends MusicBeatState {
     override function beatHit() {
         #if HSCRIPT_ALLOWED
         super.beatHit();
-        callOnHScript('onBeatHit', []);
+        callOnScripts('onBeatHit', []);
         setOnHScript('curBeat', curBeat);
         setOnHScript('curDecBeat', curDecBeat);
         #else
@@ -155,7 +159,7 @@ class CustomState extends MusicBeatState {
     override function stepHit() {
         #if HSCRIPT_ALLOWED
         super.stepHit();
-        callOnHScript('onStepHit', []);
+        callOnScripts('onStepHit', []);
         setOnHScript('curStep', curStep);
         setOnHScript('curDecStep', curDecBeat);
         #else
@@ -165,7 +169,7 @@ class CustomState extends MusicBeatState {
 
     override function destroy() {
         #if HSCRIPT_ALLOWED
-        callOnHScript('onDestroy', []);
+        callOnScripts('onDestroy', []);
         super.destroy();
         #else
         super.destroy();
@@ -226,15 +230,10 @@ class CustomState extends MusicBeatState {
 			if(found)
 			{
 				runtimeShaders.set(name, [frag, vert]);
-				//trace('Found shader $name!');
 				return true;
 			}
 		}
-			#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-			addTextToDebug('Missing shader $name .frag AND .vert files!', FlxColor.RED);
-			#else
-			FlxG.log.warn('Missing shader $name .frag AND .vert files!');
-			#end
+            FlxG.log.warn('Missing shader $name .frag AND .vert files!');
 		#else
 		FlxG.log.warn('This platform doesn\'t support Runtime Shaders!');
 		#end

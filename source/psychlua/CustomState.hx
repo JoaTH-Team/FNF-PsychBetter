@@ -39,7 +39,6 @@ class CustomState extends MusicBeatState {
     
     public function initHScript(file:String)
     {
-        var newScript:HScript = null;
         try
         {
             hscript = new HScript(null, file);
@@ -117,15 +116,24 @@ class CustomState extends MusicBeatState {
         #end
     }
 
+    var nameScripts:String = "Nothing";
+
     public function new(file:String) {
         super();
 
         #if HSCRIPT_ALLOWED
         startHScriptsNamed('states/$file.hx');
         #end
+        // idk why
+        if (file != null) nameScripts = file;
+        else nameScripts = "Nothing";
     }
 
     override function create() {
+        #if DISCORD_ALLOWED
+		DiscordClient.changePresence("Custom States: " + nameScripts, null);
+		#end
+
         #if HSCRIPT_ALLOWED
         callOnScripts('onCreate', []);
         super.create();

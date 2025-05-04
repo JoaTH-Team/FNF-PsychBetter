@@ -49,10 +49,13 @@ class OptionsState extends MusicBeatState
 
 		for (i in 0...options.length)
 		{
-			var optionText:Alphabet = new Alphabet(290, 260, options[i], true);
+			var optionText:Alphabet = new Alphabet(90, 320, options[i], true);
 			optionText.isMenuItem = true;
+			optionText.scaleX = Math.min(1, 980 / optionText.width);
 			optionText.targetY = i;
 			grpOptions.add(optionText);
+			
+			optionText.snapToPosition();
 		}
 
 		// selectorLeft = new Alphabet(0, 0, '>', true);

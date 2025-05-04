@@ -145,7 +145,7 @@ class VisualsUISubState extends BaseOptionsMenu
 		addOption(option);
 
 		var option:Option = new Option('Windows Dark Mode',
-			"If unchecked, the windows will become WHITE as unsual",
+			"If unchecked, the windows will become WHITE as unsual\n(Only Affect after reboot the game)",
 			"windowDarkMode",
 			"bool");
 		addOption(option);

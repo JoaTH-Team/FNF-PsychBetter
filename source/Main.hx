@@ -35,11 +35,9 @@ import haxe.CallStack;
 import haxe.io.Path;
 #end
 
-#if linux
+#if (linux && !debug)
 @:cppInclude('./external/gamemode_client.h')
-@:cppFileCode('
-	#define GAMEMODE_AUTO
-')
+@:cppFileCode('#define GAMEMODE_AUTO')
 #end
 
 class Main extends Sprite
@@ -69,6 +67,11 @@ class Main extends Sprite
 
 	public function new()
 	{
+		#if (cpp && windows)
+		backend.Native.fixScaling();
+		backend.WindowsAPI.darkMode(ClientPrefs.data.windowDarkMode);
+		#end
+
 		super();
 
 		// Credits to MAJigsaw77 (he's the og author for this code)

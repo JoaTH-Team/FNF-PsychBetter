@@ -144,6 +144,12 @@ class VisualsUISubState extends BaseOptionsMenu
 			'bool');
 		addOption(option);
 
+		var option:Option = new Option('Windows Dark Mode',
+			"If unchecked, the windows will become WHITE as unsual",
+			"windowDarkMode",
+			"bool");
+		addOption(option);
+
 		super();
 		add(notes);
 	}

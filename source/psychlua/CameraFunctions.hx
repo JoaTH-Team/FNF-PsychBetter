@@ -33,8 +33,20 @@ class CameraFunctions {
 			FunkinLua.luaTrace("setObjectCamera: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
 			return false;
 		});
-        Lua_helper.add_callback(lua, "addLuaCamera", function (tag:String, defaultDraw) {
-            
+        Lua_helper.add_callback(lua, "addLuaCamera", function (tag:String, defaultDraw:Bool) {
+			if(game.modchartCameras.exists(tag)) {
+				var shit:FlxCamera = game.modchartCameras.get(tag);
+				FlxG.cameras.add(shit, defaultDraw);
+			}
         });
+		Lua_helper.add_callback(lua, "removeLuaCamera", function (tag:String, destroy:Bool = true) {
+			if(!game.modchartCameras.exists(tag)) {
+				return;
+			}
+
+			var pee:FlxCamera = game.modchartCameras.get(tag);
+			FlxG.cameras.remove(pee, destroy);
+			game.modchartTexts.remove(tag);
+		});
     }
 }

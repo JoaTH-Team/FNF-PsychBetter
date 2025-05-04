@@ -524,8 +524,10 @@ class LuaUtils
 
 	public static function cameraFromString(cam:String):FlxCamera {
 		switch(cam.toLowerCase()) {
+			case 'camgame' | 'game': return PlayState.instance.camGame; // for good
 			case 'camhud' | 'hud': return PlayState.instance.camHUD;
 			case 'camother' | 'other': return PlayState.instance.camOther;
+			default: return MusicBeatState.instanceMusic.modchartCameras.get(cam);
 		}
 		return PlayState.instance.camGame;
 	}

@@ -1205,7 +1205,27 @@ class FunkinLua {
 				right_color = CoolUtil.colorFromString(right);
 			game.timeBar.setColors(left_color, right_color);
 		});
-		
+
+		Lua_helper.add_callback(lua, "setObjectCamera", function(obj:String, camera:String = '') {
+			var real = game.getLuaObject(obj);
+			if(real!=null){
+				real.cameras = [LuaUtils.cameraFromString(camera)];
+				return true;
+			}
+
+			var split:Array<String> = obj.split('.');
+			var object:FlxSprite = LuaUtils.getObjectDirectly(split[0]);
+			if(split.length > 1) {
+				object = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length-1]);
+			}
+
+			if(object != null) {
+				object.cameras = [LuaUtils.cameraFromString(camera)];
+				return true;
+			}
+			luaTrace("setObjectCamera: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+			return false;
+		});
 		Lua_helper.add_callback(lua, "setBlendMode", function(obj:String, blend:String = '') {
 			var real = game.getLuaObject(obj);
 			if(real != null) {
@@ -1471,7 +1491,7 @@ class FunkinLua {
 		#end
 		//
 
-		Lua_helper.add_callback(lua, "debugPrint", function(text:Dynamic = '', color:String = 'WHITE') MusicBeatState.addTextToDebug(text, CoolUtil.colorFromString(color)));
+		Lua_helper.add_callback(lua, "debugPrint", function(text:Dynamic = '', color:String = 'WHITE') PlayState.instance.addTextToDebug(text, CoolUtil.colorFromString(color)));
 
 		addLocalCallback("close", function() {
 			closed = true;
@@ -1485,7 +1505,6 @@ class FunkinLua {
 		#if flxanimate FlxAnimateFunctions.implement(this); #end
 		ReflectionFunctions.implement(this);
 		TextFunctions.implement(this);
-		CameraFunctions.implement(this);
 		ExtraFunctions.implement(this);
 		CustomSubstate.implement(this);
 		ShaderFunctions.implement(this);
@@ -1612,7 +1631,7 @@ class FunkinLua {
 			if(deprecated && !getBool('luaDeprecatedWarnings')) {
 				return;
 			}
-			MusicBeatState.addTextToDebug(text, color);
+			PlayState.instance.addTextToDebug(text, color);
 		}
 	}
 

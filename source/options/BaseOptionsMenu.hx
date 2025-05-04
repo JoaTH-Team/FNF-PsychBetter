@@ -10,7 +10,7 @@ import objects.AttachedText;
 import options.Option;
 import backend.InputFormatter;
 
-class BaseOptionsMenu extends MusicBeatSubState
+class BaseOptionsMenu extends MusicBeatSubstate
 {
 	private var curOption:Option = null;
 	private var curSelected:Int = 0;

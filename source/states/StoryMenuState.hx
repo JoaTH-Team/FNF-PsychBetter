@@ -13,93 +13,33 @@ import objects.MenuCharacter;
 import substates.GameplayChangersSubstate;
 import substates.ResetScoreSubState;
 
-#if HSCRIPT_ALLOWED
-import psychlua.LuaUtils;
-import psychlua.HScript;
-import psychlua.HScript.HScriptInfos;
-import crowplexus.iris.Iris;
-import crowplexus.hscript.Expr.Error as IrisError;
-import crowplexus.hscript.Printer;
-#end
-
 class StoryMenuState extends MusicBeatState
 {
 	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();
 
-	public var scoreText:FlxText;
+	var scoreText:FlxText;
 
 	private static var lastDifficultyName:String = '';
 	var curDifficulty:Int = 1;
 
-	public var txtWeekTitle:FlxText;
-	public var bgSprite:FlxSprite;
+	var txtWeekTitle:FlxText;
+	var bgSprite:FlxSprite;
 
 	private static var curWeek:Int = 0;
 
-	public var txtTracklist:FlxText;
+	var txtTracklist:FlxText;
 
-	public var grpWeekText:FlxTypedGroup<MenuItem>;
-	public var grpWeekCharacters:FlxTypedGroup<MenuCharacter>;
+	var grpWeekText:FlxTypedGroup<MenuItem>;
+	var grpWeekCharacters:FlxTypedGroup<MenuCharacter>;
 
-	public var grpLocks:FlxTypedGroup<FlxSprite>;
+	var grpLocks:FlxTypedGroup<FlxSprite>;
 
-	public var difficultySelectors:FlxGroup;
-	public var sprDifficulty:FlxSprite;
-	public var leftArrow:FlxSprite;
-	public var rightArrow:FlxSprite;
+	var difficultySelectors:FlxGroup;
+	var sprDifficulty:FlxSprite;
+	var leftArrow:FlxSprite;
+	var rightArrow:FlxSprite;
 
-	public var loadedWeeks:Array<WeekData> = [];
-
-	public static var instance:StoryMenuState = null;
-
-	#if HSCRIPT_ALLOWED
-	var hscript:HScript;
-	public function startedHScripts(scriptFile:String)
-	{
-		#if MODS_ALLOWED
-		var scriptToLoad:String = Paths.modFolders(scriptFile);
-		if(!FileSystem.exists(scriptToLoad))
-			scriptToLoad = Paths.getSharedPath(scriptFile);
-		#else
-		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
-		#end
-
-		if(FileSystem.exists(scriptToLoad))
-		{
-			initHScript(scriptToLoad);
-			return true;
-		}
-		return false;
-	}
-
-	public function initHScript(file:String)
-	{
-		try
-		{
-			hscript = new HScript(null, file);
-			hscript.execute();
-			if (hscript.exists('onCreate')) hscript.call('onCreate');
-			trace('initialized hscript interp successfully: $file');
-		}
-		catch(e:IrisError)
-		{
-			var pos:HScriptInfos = cast {fileName: file, showLine: false};
-			Iris.error(Printer.errorToString(e, false), pos);
-			if(hscript != null)
-				hscript.destroy();
-		}
-	}
-
-	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null) {
-		#if HSCRIPT_ALLOWED
-		if(hscript != null)
-		{
-			if (hscript.exists(funcToCall))
-				hscript.executeFunction(funcToCall, args);
-		}
-		#end
-	}
-	#end
+	var loadedWeeks:Array<WeekData> = [];
 
 	override function create()
 	{
@@ -110,12 +50,6 @@ class StoryMenuState extends MusicBeatState
 		WeekData.reloadWeekFiles(true);
 		if(curWeek >= WeekData.weeksList.length) curWeek = 0;
 		persistentUpdate = persistentDraw = true;
-
-		instance = this;
-		#if HSCRIPT_ALLOWED
-		startedHScripts("states/StoryMenuState.hx");
-		callOnScripts("onCreate", []);
-		#end
 
 		scoreText = new FlxText(10, 10, 0, "SCORE: 49324858", 36);
 		scoreText.setFormat("VCR OSD Mono", 32);
@@ -242,16 +176,6 @@ class StoryMenuState extends MusicBeatState
 		changeDifficulty();
 
 		super.create();
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onCreatePost", []);
-		#end
-
-		#if HSCRIPT_ALLOWED
-		if (hscript != null) {
-			hscript.set("game", MusicBeatState.getState());
-		}
-		#end
 	}
 
 	override function closeSubState() {
@@ -267,10 +191,6 @@ class StoryMenuState extends MusicBeatState
 		if(Math.abs(intendedScore - lerpScore) < 10) lerpScore = intendedScore;
 
 		scoreText.text = "WEEK SCORE:" + lerpScore;
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onUpdate", [elapsed]);
-		#end
 
 		// FlxG.watch.addQuick('font', scoreText.font);
 
@@ -345,17 +265,13 @@ class StoryMenuState extends MusicBeatState
 			lock.y = grpWeekText.members[lock.ID].y;
 			lock.visible = (lock.y > FlxG.height / 2);
 		});
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onUpdatePost", [elapsed]);
-		#end
 	}
 
-	public var movedBack:Bool = false;
-	public var selectedWeek:Bool = false;
-	public var stopspamming:Bool = false;
+	var movedBack:Bool = false;
+	var selectedWeek:Bool = false;
+	var stopspamming:Bool = false;
 
-	public function selectWeek()
+	function selectWeek()
 	{
 		if (!weekIsLocked(loadedWeeks[curWeek].fileName))
 		{
@@ -381,10 +297,6 @@ class StoryMenuState extends MusicBeatState
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
 				PlayState.campaignScore = 0;
 				PlayState.campaignMisses = 0;
-
-				#if HSCRIPT_ALLOWED
-				callOnScripts("onSelectWeek", []);
-				#end
 			}
 			catch(e:Dynamic)
 			{
@@ -420,8 +332,8 @@ class StoryMenuState extends MusicBeatState
 		else FlxG.sound.play(Paths.sound('cancelMenu'));
 	}
 
-	public var tweenDifficulty:FlxTween;
-	public function changeDifficulty(change:Int = 0):Void
+	var tweenDifficulty:FlxTween;
+	function changeDifficulty(change:Int = 0):Void
 	{
 		curDifficulty += change;
 
@@ -455,19 +367,12 @@ class StoryMenuState extends MusicBeatState
 		#if !switch
 		intendedScore = Highscore.getWeekScore(loadedWeeks[curWeek].fileName, curDifficulty);
 		#end
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onChangeDifficulty", []);
-		if (hscript != null) {
-			hscript.set("curDifficulty", curDifficulty);
-		}
-		#end
 	}
 
-	public var lerpScore:Int = 0;
-	public var intendedScore:Int = 0;
+	var lerpScore:Int = 0;
+	var intendedScore:Int = 0;
 
-	public function changeWeek(change:Int = 0):Void
+	function changeWeek(change:Int = 0):Void
 	{
 		curWeek += change;
 
@@ -520,21 +425,14 @@ class StoryMenuState extends MusicBeatState
 			curDifficulty = newPos;
 		}
 		updateText();
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onChangeWeek", []);
-		if (hscript != null) {
-			hscript.set("curWeek", curWeek);
-		}
-		#end
 	}
 
-	public function weekIsLocked(name:String):Bool {
+	function weekIsLocked(name:String):Bool {
 		var leWeek:WeekData = WeekData.weeksLoaded.get(name);
 		return (!leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!weekCompleted.exists(leWeek.weekBefore) || !weekCompleted.get(leWeek.weekBefore)));
 	}
 
-	public function updateText()
+	function updateText()
 	{
 		var weekArray:Array<String> = loadedWeeks[curWeek].weekCharacters;
 		for (i in 0...grpWeekCharacters.length) {
@@ -560,51 +458,6 @@ class StoryMenuState extends MusicBeatState
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(loadedWeeks[curWeek].fileName, curDifficulty);
-		#end
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onUpdateText", []);
-		#end
-	}
-
-	override function destroy():Void
-	{
-		super.destroy();
-
-		FlxG.autoPause = ClientPrefs.data.autoPause;
-		if (!FlxG.sound.music.playing)
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-
-		#if HSCRIPT_ALLOWED
-		if (hscript != null) {
-			hscript.call('onDestroy');
-			hscript.destroy();
-		}
-		#end
-	}	
-
-	override function beatHit() {
-		super.beatHit();
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onBeatHit", []);
-		if (hscript != null) {
-			hscript.set("curBeat", curBeat);
-			hscript.set("curDecBeat", curDecBeat);
-		}
-		#end
-
-		instance = null;
-	}
-
-	override function stepHit() {
-		super.stepHit();
-
-		#if HSCRIPT_ALLOWED
-		callOnScripts("onStepHit", []);
-		if (hscript != null) {
-			hscript.set("curStep", curStep);
-		}
 		#end
 	}
 }

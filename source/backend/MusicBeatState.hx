@@ -1,7 +1,5 @@
 package backend;
 
-import flixel.util.FlxSave;
-import psychlua.ModchartSprite;
 import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
@@ -23,32 +21,9 @@ class MusicBeatState extends FlxUIState
 		return Controls.instance;
 	}
 
-	public static var instanceMusic:MusicBeatState = null;
-	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
-
-	public function getLuaObject(tag:String, text:Bool=true):FlxSprite {
-		#if LUA_ALLOWED
-		if(modchartSprites.exists(tag)) return modchartSprites.get(tag);
-		if(text && modchartTexts.exists(tag)) return modchartTexts.get(tag);
-		if(variables.exists(tag)) return variables.get(tag);
-		#end
-		return null;
-	}
-
 	var _psychCameraInitialized:Bool = false;
 
-	#if LUA_ALLOWED
-	public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
-	public var modchartSprites:Map<String, ModchartSprite> = new Map<String, ModchartSprite>();
-	public var modchartCameras:Map<String, FlxCamera> = new Map<String, FlxCamera>();
-	public var modchartTimers:Map<String, FlxTimer> = new Map<String, FlxTimer>();
-	public var modchartSounds:Map<String, FlxSound> = new Map<String, FlxSound>();
-	public var modchartTexts:Map<String, FlxText> = new Map<String, FlxText>();
-	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
-	#end
-
 	override function create() {
-		instanceMusic = this;
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED Mods.updatedOnState = false; #end
 
@@ -73,49 +48,9 @@ class MusicBeatState extends FlxUIState
 		return camera;
 	}
 
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-	private static var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
-	
-	static function initDebugGroup() {
-		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-		var camForDebug:FlxCamera = new FlxCamera();
-		camForDebug.bgColor = FlxColor.TRANSPARENT;
-		FlxG.cameras.add(camForDebug, false);
-
-		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
-		luaDebugGroup.cameras = [camForDebug];
-		FlxG.state.add(luaDebugGroup);
-		#end
-	}
-	#end
-
-	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-	public static function addTextToDebug(text:String, color:FlxColor) {
-		initDebugGroup();
-		var newText:psychlua.DebugLuaText = luaDebugGroup.recycle(psychlua.DebugLuaText);
-		newText.text = text;
-		newText.color = color;
-		newText.disableTime = 6;
-		newText.alpha = 1;
-		newText.setPosition(10, 8 - newText.height);
-
-		luaDebugGroup.forEachAlive(function(spr:psychlua.DebugLuaText) {
-			spr.y += newText.height + 2;
-		});
-		luaDebugGroup.add(newText);
-
-		Sys.println(text);
-	}
-	#end
-
 	public static var timePassedOnState:Float = 0;
 	override function update(elapsed:Float)
 	{
-		if (FlxG.keys.justPressed.F5)
-			FlxG.resetState();
-		if (FlxG.keys.justPressed.F5 && FlxG.keys.justPressed.SHIFT)
-			FlxG.resetGame();
-		
 		//everyStep();
 		var oldStep:Int = curStep;
 		timePassedOnState += elapsed;

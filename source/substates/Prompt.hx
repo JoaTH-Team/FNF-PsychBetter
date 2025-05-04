@@ -13,7 +13,7 @@ import openfl.geom.Rectangle;
  * ...
  * @author 
  */
-class Prompt extends MusicBeatSubState
+class Prompt extends MusicBeatSubstate
 {
 	var selected = 0;
 	public var okc:Void->Void;

@@ -12,7 +12,7 @@ import states.StoryMenuState;
 import states.FreeplayState;
 import options.OptionsState;
 
-class PauseSubState extends MusicBeatSubState
+class PauseSubState extends MusicBeatSubstate
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 

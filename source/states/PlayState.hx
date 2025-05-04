@@ -109,10 +109,20 @@ class PlayState extends MusicBeatState
 	public var boyfriendMap:Map<String, Character> = new Map<String, Character>();
 	public var dadMap:Map<String, Character> = new Map<String, Character>();
 	public var gfMap:Map<String, Character> = new Map<String, Character>();
+	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	#if HSCRIPT_ALLOWED
 	public var hscriptArray:Array<HScript> = [];
 	public var instancesExclude:Array<String> = [];
+	#end
+
+	#if LUA_ALLOWED
+	public var modchartTweens:Map<String, FlxTween> = new Map<String, FlxTween>();
+	public var modchartSprites:Map<String, ModchartSprite> = new Map<String, ModchartSprite>();
+	public var modchartTimers:Map<String, FlxTimer> = new Map<String, FlxTimer>();
+	public var modchartSounds:Map<String, FlxSound> = new Map<String, FlxSound>();
+	public var modchartTexts:Map<String, FlxText> = new Map<String, FlxText>();
+	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
 	#end
 
 	public var BF_X:Float = 770;
@@ -251,6 +261,9 @@ class PlayState extends MusicBeatState
 	public static var instance:PlayState;
 	#if LUA_ALLOWED public var luaArray:Array<FunkinLua> = []; #end
 
+	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	private var luaDebugGroup:FlxTypedGroup<psychlua.DebugLuaText>;
+	#end
 	public var introSoundsSuffix:String = '';
 
 	// Less laggy controls
@@ -387,6 +400,12 @@ class PlayState extends MusicBeatState
 		add(gfGroup);
 		add(dadGroup);
 		add(boyfriendGroup);
+
+		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		luaDebugGroup = new FlxTypedGroup<psychlua.DebugLuaText>();
+		luaDebugGroup.cameras = [camOther];
+		add(luaDebugGroup);
+		#end
 
 		// "GLOBAL" SCRIPTS
 		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
@@ -669,6 +688,24 @@ class PlayState extends MusicBeatState
 		return playbackRate;
 	}
 
+	#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+	public function addTextToDebug(text:String, color:FlxColor) {
+		var newText:psychlua.DebugLuaText = luaDebugGroup.recycle(psychlua.DebugLuaText);
+		newText.text = text;
+		newText.color = color;
+		newText.disableTime = 6;
+		newText.alpha = 1;
+		newText.setPosition(10, 8 - newText.height);
+
+		luaDebugGroup.forEachAlive(function(spr:psychlua.DebugLuaText) {
+			spr.y += newText.height + 2;
+		});
+		luaDebugGroup.add(newText);
+
+		Sys.println(text);
+	}
+	#end
+
 	public function reloadHealthBarColors() {
 		healthBar.setColors(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
 			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
@@ -776,6 +813,15 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
+	public function getLuaObject(tag:String, text:Bool=true):FlxSprite {
+		#if LUA_ALLOWED
+		if(modchartSprites.exists(tag)) return modchartSprites.get(tag);
+		if(text && modchartTexts.exists(tag)) return modchartTexts.get(tag);
+		if(variables.exists(tag)) return variables.get(tag);
+		#end
+		return null;
+	}
+
 	function startCharacterPos(char:Character, ?gfCheck:Bool = false) {
 		if(gfCheck && char.curCharacter.startsWith('gf')) { //IF DAD IS GIRLFRIEND, HE GOES TO HER POSITION
 			char.setPosition(GF_X, GF_Y);
@@ -833,7 +879,7 @@ class PlayState extends MusicBeatState
 			return videoCutscene;
 		}
 		#if HSCRIPT_ALLOWED
-		else MusicBeatState.addTextToDebug("Video not found: " + fileName, FlxColor.RED);
+		else addTextToDebug("Video not found: " + fileName, FlxColor.RED);
 		#else
 		else FlxG.log.error("Video not found: " + fileName);
 		#end
@@ -2159,7 +2205,7 @@ class PlayState extends MusicBeatState
 					var len:Int = e.message.indexOf('\n') + 1;
 					if(len <= 0) len = e.message.length;
 					#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-					MusicBeatState.addTextToDebug('ERROR ("Set Property" Event) - ' + e.message.substr(0, len), FlxColor.RED);
+					addTextToDebug('ERROR ("Set Property" Event) - ' + e.message.substr(0, len), FlxColor.RED);
 					#else
 					FlxG.log.warn('ERROR ("Set Property" Event) - ' + e.message.substr(0, len));
 					#end
@@ -3454,7 +3500,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 			#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
-			MusicBeatState.addTextToDebug('Missing shader $name .frag AND .vert files!', FlxColor.RED);
+			addTextToDebug('Missing shader $name .frag AND .vert files!', FlxColor.RED);
 			#else
 			FlxG.log.warn('Missing shader $name .frag AND .vert files!');
 			#end

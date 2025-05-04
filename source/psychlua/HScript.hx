@@ -153,7 +153,6 @@ class HScript extends Iris
 		set('FlxG', flixel.FlxG);
 		set('FlxMath', flixel.math.FlxMath);
 		set('FlxSprite', flixel.FlxSprite);
-		set('FlxText', flixel.text.FlxText);
 		set('FlxCamera', flixel.FlxCamera);
 		set('PsychCamera', backend.PsychCamera);
 		set('FlxTimer', flixel.util.FlxTimer);
@@ -172,7 +171,6 @@ class HScript extends Iris
 		set('Alphabet', Alphabet);
 		set('Note', objects.Note);
 		set('CustomSubstate', CustomSubstate);
-		set('CustomState', CustomState);
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end
@@ -203,14 +201,14 @@ class HScript extends Iris
 		});
 		set('debugPrint', function(text:String, ?color:FlxColor = null) {
 			if(color == null) color = FlxColor.WHITE;
-			MusicBeatState.addTextToDebug(text, color);
+			PlayState.instance.addTextToDebug(text, color);
 		});
 		set('getModSetting', function(saveTag:String, ?modName:String = null) {
 			if(modName == null)
 			{
 				if(this.modFolder == null)
 				{
-					MusicBeatState.addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
+					PlayState.instance.addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
 					return null;
 				}
 				modName = this.modFolder;
@@ -442,11 +440,6 @@ class HScript extends Iris
 	}
 	#end
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>) {
-		if (funcToRun == null) return null;
-		return call(funcToRun, funcArgs);
-	}
-
 	override function call(funcToRun:String, ?args:Array<Dynamic>):IrisCall {
 		if (funcToRun == null || interp == null) return null;
 
@@ -634,15 +627,15 @@ class HScript
 	#if LUA_ALLOWED
 	public static function implement(funk:FunkinLua) {
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
-			MusicBeatState.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
 			return null;
 		});
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
-			MusicBeatState.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
 			return null;
 		});
 		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
-			MusicBeatState.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
+			PlayState.instance.addTextToDebug('HScript is not supported on this platform!', FlxColor.RED);
 			return null;
 		});
 	}

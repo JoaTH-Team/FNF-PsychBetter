@@ -2,7 +2,7 @@ package backend;
 
 import flixel.FlxSubState;
 
-class MusicBeatSubState extends FlxSubState
+class MusicBeatSubstate extends FlxSubState
 {
 	public function new()
 	{

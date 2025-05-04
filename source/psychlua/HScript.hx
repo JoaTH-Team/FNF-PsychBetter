@@ -154,6 +154,8 @@ class HScript extends Iris
 		set('FlxMath', flixel.math.FlxMath);
 		set('FlxSprite', flixel.FlxSprite);
 		set('FlxCamera', flixel.FlxCamera);
+		set('FlxText', flixel.text.FlxText);
+		set('FlxTypeText', flixel.addons.text.FlxTypeText);
 		set('PsychCamera', backend.PsychCamera);
 		set('FlxTimer', flixel.util.FlxTimer);
 		set('FlxTween', flixel.tweens.FlxTween);
@@ -349,9 +351,9 @@ class HScript extends Iris
 		set('Function_StopHScript', LuaUtils.Function_StopHScript);
 		set('Function_StopAll', LuaUtils.Function_StopAll);
 		
-		set('add', FlxG.state.add);
-		set('insert', FlxG.state.insert);
-		set('remove', FlxG.state.remove);
+		set('add', function (obj:FlxBasic) MusicBeatState.getState().add(obj));
+		set('insert', function (pos:Int, obj:FlxBasic) MusicBeatState.getState().insert(pos, obj));
+		set('remove', function (obj:FlxBasic, splice:Bool = false) MusicBeatState.getState().remove(obj, splice));
 
 		if(PlayState.instance == FlxG.state)
 		{

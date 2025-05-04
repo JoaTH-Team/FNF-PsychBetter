@@ -69,35 +69,44 @@ class CustomState extends MusicBeatState {
     }
     
     public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
-        var returnVal:Dynamic = LuaUtils.Function_Continue;
-    
-        #if HSCRIPT_ALLOWED
-        if(exclusions == null) exclusions = new Array();
-        if(excludeValues == null) excludeValues = new Array();
-        excludeValues.push(LuaUtils.Function_Continue);
-    
-        @:privateAccess
-        if(hscript != null && hscript.exists(funcToCall)) {
-            if(!exclusions.contains(hscript.origin)) {
-                var callValue = hscript.call(funcToCall, args);
-                if(callValue != null)
-                {
-                    var myValue:Dynamic = callValue.returnValue;
-    
-                    if((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
-                    {
-                        returnVal = myValue;
-                    }
-                    else if(myValue != null && !excludeValues.contains(myValue))
-                    {
-                        returnVal = myValue;
-                    }
-                }
-            }
+        try {
+        	var returnVal:Dynamic = LuaUtils.Function_Continue;
+        	#if HSCRIPT_ALLOWED
+        	if (exclusions == null)
+        		exclusions = new Array();
+        	if (excludeValues == null)
+        		excludeValues = new Array();
+        	excludeValues.push(LuaUtils.Function_Continue);
+        	@:privateAccess
+        	if (hscript != null && hscript.exists(funcToCall))
+        	{
+        		if (!exclusions.contains(hscript.origin))
+        		{
+        			var callValue = hscript.call(funcToCall, args);
+        			if (callValue != null)
+        			{
+        				var myValue:Dynamic = callValue.returnValue;
+        				if ((myValue == LuaUtils.Function_StopHScript || myValue == LuaUtils.Function_StopAll)
+        					&& !excludeValues.contains(myValue)
+        					&& !ignoreStops)
+        				{
+        					returnVal = myValue;
+        				}
+        				else if (myValue != null && !excludeValues.contains(myValue))
+        				{
+        					returnVal = myValue;
+        				}
+        			}
+        		}
+        	}
+        	#end
+        	return returnVal;
         }
-        #end
-    
-        return returnVal;
+        catch (e:IrisError)
+        {
+            Iris.error(Printer.errorToString(e, false));
+            return null;
+        }
     }
     
     public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
@@ -106,14 +115,22 @@ class CustomState extends MusicBeatState {
     }
     
     public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
-        #if HSCRIPT_ALLOWED
-        if(exclusions == null) exclusions = [];
-        if(hscript != null && !exclusions.contains(hscript.origin)) {
-            if(!instancesExclude.contains(variable))
-                instancesExclude.push(variable);
-            hscript.set(variable, arg);
+        try {
+            #if HSCRIPT_ALLOWED
+            if (exclusions == null)
+                exclusions = [];
+            if (hscript != null && !exclusions.contains(hscript.origin))
+            {
+                if (!instancesExclude.contains(variable))
+                    instancesExclude.push(variable);
+                hscript.set(variable, arg);
+            }
+            #end
         }
-        #end
+        catch (e:IrisError)
+        {
+            Iris.error(Printer.errorToString(e, false));
+        }
     }
 
     var nameScripts:String = "Nothing";

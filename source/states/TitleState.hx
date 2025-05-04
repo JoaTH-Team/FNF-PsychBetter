@@ -9,18 +9,6 @@ import haxe.Json;
 import openfl.Assets;
 import shaders.ColorSwap;
 
-#if LUA_ALLOWED
-import psychlua.LuaUtils;
-#end
-
-#if HSCRIPT_ALLOWED
-import psychlua.HScript;
-import psychlua.HScript.HScriptInfos;
-import crowplexus.iris.Iris;
-import crowplexus.hscript.Expr.Error as IrisError;
-import crowplexus.hscript.Printer;
-#end
-
 typedef TitleData =
 {
 	titlex:Float,
@@ -37,19 +25,19 @@ class TitleState extends MusicBeatState
 {
 	public static var initialized:Bool = false;
 
-	var blackScreen:FlxSprite;
-	var credGroup:FlxGroup;
-	var credTextShit:Alphabet;
-	var textGroup:FlxGroup;
-	var ngSpr:FlxSprite;
+	public var blackScreen:FlxSprite;
+	public var credGroup:FlxGroup;
+	public var credTextShit:Alphabet;
+	public var textGroup:FlxGroup;
+	public var ngSpr:FlxSprite;
 	
-	var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
-	var titleTextAlphas:Array<Float> = [1, .64];
+	public var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
+	public var titleTextAlphas:Array<Float> = [1, .64];
 
-	var curWacky:Array<String> = [];
-	var wackyImage:FlxSprite;
-	var skippedIntro:Bool = false;
-	var titleJSON:TitleData;
+	public var curWacky:Array<String> = [];
+	public var wackyImage:FlxSprite;
+	public var skippedIntro:Bool = false;
+	public var titleJSON:TitleData;
 
     #if HSCRIPT_ALLOWED
     public var hscript:HScript;
@@ -159,7 +147,7 @@ class TitleState extends MusicBeatState
         super();
 
         #if HSCRIPT_ALLOWED
-        startHScriptsNamed('states/TitleState.hx');
+        startHScriptsNamed('states/${Type.getClassName(Type.getClass(this)).split('.').pop()}.hx');
         #end
     }
 
@@ -197,11 +185,11 @@ class TitleState extends MusicBeatState
 		#end
 	}
 
-	var logoBl:FlxSprite;
-	var gfDance:FlxSprite;
-	var danceLeft:Bool = false;
-	var titleText:FlxSprite;
-	var swagShader:ColorSwap = null;
+	public var logoBl:FlxSprite;
+	public var gfDance:FlxSprite;
+	public var danceLeft:Bool = false;
+	public var titleText:FlxSprite;
+	public var swagShader:ColorSwap = null;
 
 	function startIntro()
 	{
@@ -308,9 +296,9 @@ class TitleState extends MusicBeatState
 		return [for (i in firstArray) i.split('--')];
 	}
 
-	var transitioning:Bool = false;
-	var newTitle:Bool = false;
-	var titleTimer:Float = 0;
+	public var transitioning:Bool = false;
+	public var newTitle:Bool = false;
+	public var titleTimer:Float = 0;
 
 	override function update(elapsed:Float)
 	{

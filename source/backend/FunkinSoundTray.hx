@@ -16,7 +16,7 @@ import flixel.FlxG;
  *  Gets added to the game in Main.hx, right after FlxGame is new'd
  *  since it's a Sprite rather than Flixel related object
  */
-class CustomFlxSoundTray extends FlxSoundTray
+class FunkinSoundTray extends FlxSoundTray
 {
   var graphicScale:Float = 0.30;
   var lerpYPos:Float = 0;

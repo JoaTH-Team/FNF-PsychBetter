@@ -1,11 +1,19 @@
 package psychlua;
 
 import flixel.FlxObject;
+import flixel.FlxSubState;
+import sys.FileSystem;
+import sys.io.File;
 
 class CustomSubstate extends MusicBeatSubstate
 {
 	public static var name:String = 'unnamed';
 	public static var instance:CustomSubstate;
+	
+	#if HSCRIPT_ALLOWED
+	public var hscript:HScript;
+	public var instancesExclude:Array<String> = [];
+	#end
 
 	#if LUA_ALLOWED
 	public static function implement(funk:FunkinLua)
@@ -30,16 +38,54 @@ class CustomSubstate extends MusicBeatSubstate
 				PlayState.instance.vocals.pause();
 			}
 		}
-		PlayState.instance.openSubState(new CustomSubstate(name));
-		PlayState.instance.setOnHScript('customSubstate', instance);
+		var substate = new CustomSubstate(name);
+		PlayState.instance.openSubState(substate);
+		PlayState.instance.setOnHScript('customSubstate', substate);
 		PlayState.instance.setOnHScript('customSubstateName', name);
 	}
+
+	#if HSCRIPT_ALLOWED
+	public function startHScriptsNamed(scriptFile:String)
+	{
+		#if MODS_ALLOWED
+		var scriptToLoad:String = Paths.modFolders(scriptFile);
+		if(!FileSystem.exists(scriptToLoad))
+			scriptToLoad = Paths.getSharedPath(scriptFile);
+		#else
+		var scriptToLoad:String = Paths.getSharedPath(scriptFile);
+		#end
+	
+		if(FileSystem.exists(scriptToLoad))
+		{
+			initHScript(scriptToLoad);
+			return true;
+		}
+		return false;
+	}
+	
+	public function initHScript(file:String)
+	{
+		try
+		{
+			hscript = new HScript(null, file);
+			if (hscript.exists('onCreate')) hscript.call('onCreate');
+			trace('initialized hscript interp successfully: $file');
+		}
+		catch(e:Dynamic)
+		{
+			trace('HScript Error: $e');
+			var stack = haxe.CallStack.exceptionStack();
+			trace('Stack: ${stack.join("\n")}');
+		}
+	}
+	#end
 
 	public static function closeCustomSubstate()
 	{
 		if(instance != null)
 		{
-			PlayState.instance.closeSubState();
+			if (PlayState.instance != null)
+				PlayState.instance.closeSubState();
 			instance = null;
 			return true;
 		}
@@ -67,9 +113,20 @@ class CustomSubstate extends MusicBeatSubstate
 	{
 		instance = this;
 
-		PlayState.instance.callOnScripts('onCustomSubstateCreate', [name]);
+		#if HSCRIPT_ALLOWED
+		startHScriptsNamed('states/$name.hx');
+		callOnHScript('onCustomSubstateCreate', [name]);
+		#end
+		
+		if (PlayState.instance != null)
+			PlayState.instance.callOnScripts('onCustomSubstateCreate', [name]);
 		super.create();
-		PlayState.instance.callOnScripts('onCustomSubstateCreatePost', [name]);
+		
+		#if HSCRIPT_ALLOWED
+		callOnHScript('onCustomSubstateCreatePost', [name]);
+		#end
+		if (PlayState.instance != null)
+			PlayState.instance.callOnScripts('onCustomSubstateCreatePost', [name]);
 	}
 	
 	public function new(name:String)
@@ -81,18 +138,46 @@ class CustomSubstate extends MusicBeatSubstate
 	
 	override function update(elapsed:Float)
 	{
-		PlayState.instance.callOnScripts('onCustomSubstateUpdate', [name, elapsed]);
+		#if HSCRIPT_ALLOWED
+		callOnHScript('onCustomSubstateUpdate', [name, elapsed]);
+		#end
+		if (PlayState.instance != null)
+			PlayState.instance.callOnScripts('onCustomSubstateUpdate', [name, elapsed]);
+		
 		super.update(elapsed);
-		PlayState.instance.callOnScripts('onCustomSubstateUpdatePost', [name, elapsed]);
+		
+		#if HSCRIPT_ALLOWED
+		callOnHScript('onCustomSubstateUpdatePost', [name, elapsed]);
+		#end
+		if (PlayState.instance != null)
+			PlayState.instance.callOnScripts('onCustomSubstateUpdatePost', [name, elapsed]);
 	}
 
 	override function destroy()
 	{
-		PlayState.instance.callOnScripts('onCustomSubstateDestroy', [name]);
+		#if HSCRIPT_ALLOWED
+		callOnHScript('onCustomSubstateDestroy', [name]);
+		#end
+		if (PlayState.instance != null)
+			PlayState.instance.callOnScripts('onCustomSubstateDestroy', [name]);
+		
 		name = 'unnamed';
+		instance = null;
 
-		PlayState.instance.setOnHScript('customSubstate', null);
-		PlayState.instance.setOnHScript('customSubstateName', name);
+		if (PlayState.instance != null) {
+			PlayState.instance.setOnHScript('customSubstate', null);
+			PlayState.instance.setOnHScript('customSubstateName', name);
+		}
 		super.destroy();
 	}
+
+	#if HSCRIPT_ALLOWED
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null):Dynamic
+	{
+		if(args == null) args = [];
+		if(hscript != null && hscript.exists(funcToCall))
+			return hscript.call(funcToCall, args);
+		return null;
+	}
+	#end
 }

@@ -174,6 +174,7 @@ class HScript extends Iris
 		set('Note', objects.Note);
 		set('CustomSubstate', CustomSubstate);
 		set('CustomState', CustomState);
+		set('CustomHelper', CustomHelper);
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end

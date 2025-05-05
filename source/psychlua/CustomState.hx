@@ -152,6 +152,10 @@ class CustomState extends MusicBeatState {
 		#end
 
         #if HSCRIPT_ALLOWED
+        setOnScripts("game", this);
+        #end
+
+        #if HSCRIPT_ALLOWED
         callOnScripts('onCreate', []);
         super.create();
         callOnScripts('onCreatePost', []);

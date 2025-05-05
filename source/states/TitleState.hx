@@ -153,6 +153,10 @@ class TitleState extends MusicBeatState
 
 	override public function create()
 	{
+        #if HSCRIPT_ALLOWED
+        setOnScripts("game", this);
+        #end
+
 		#if HSCRIPT_ALLOWED
 		super.create();
 		callOnScripts("onCreate", []);

@@ -127,6 +127,10 @@ class FlashingState extends MusicBeatState
 
 	override function create()
 	{
+        #if HSCRIPT_ALLOWED
+        setOnScripts("game", this);
+        #end
+
 		#if HSCRIPT_ALLOWED
 		callOnScripts("onCreate", []);
 		#end

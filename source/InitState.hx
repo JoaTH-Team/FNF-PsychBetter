@@ -175,12 +175,12 @@ class InitState extends flixel.FlxState
 		Paths.clearUnusedMemory();
 
         // Switch to your initial state
-        
-        @:privateAccess
-            FlxG.switchState(Type.createInstance(Main.game.initialState, []));
-        
+
         #if HSCRIPT_ALLOWED
         callOnScripts("onCreatePost", []);
         #end
+        
+        @:privateAccess
+            FlxG.switchState(Type.createInstance(Main.game.initialState, []));
     }
 }

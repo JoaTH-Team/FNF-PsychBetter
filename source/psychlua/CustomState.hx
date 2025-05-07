@@ -153,6 +153,8 @@ class CustomState extends MusicBeatState {
 
         #if HSCRIPT_ALLOWED
         setOnScripts("game", this);
+        setOnScripts("initLuaShader", initLuaShader);
+        setOnScripts("createRuntimeShader", createRuntimeShader);
         #end
 
         #if HSCRIPT_ALLOWED

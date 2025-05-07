@@ -210,4 +210,12 @@ class MusicBeatState extends FlxUIState
 		if(PlayState.SONG != null && PlayState.SONG.notes[curSection] != null) val = PlayState.SONG.notes[curSection].sectionBeats;
 		return val == null ? 4 : val;
 	}
+
+	public function openCustomSubState(name:String) {
+		return getState().openSubState(new psychlua.CustomSubstate(name));
+	}
+
+	public function closeCustomSubState() {
+		return getState().closeSubState();
+	}
 }

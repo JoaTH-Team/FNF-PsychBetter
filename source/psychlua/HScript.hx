@@ -220,6 +220,7 @@ class HScript extends Iris
 			return LuaUtils.getModSetting(saveTag, modName);
 		});
 		
+		// Soft-code switch state/open or closed custom state
 		set('openCustomSubState', function (name:String, ?stopUpdateFromState:Bool = false) {
 			if (stopUpdateFromState) {
 				MusicBeatState.getState().persistentDraw = MusicBeatState.getState().persistentUpdate = false;
@@ -230,6 +231,14 @@ class HScript extends Iris
 		});
 		set('closeCustomSubState', function () {
 			return MusicBeatState.getState().closeSubState();
+		});
+
+		set('switchCustomState', function (name:String, ?switchWithLoad:Bool = false) {
+			if (switchWithLoad) {
+				return LoadingState.loadAndSwitchState(new CustomState(name));
+			} else {
+				return FlxG.switchState(new CustomState(name));
+			}
 		});
 
 		// Keyboard & Gamepads

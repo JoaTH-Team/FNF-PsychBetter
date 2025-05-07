@@ -10,7 +10,7 @@ import crowplexus.hscript.Expr.Error as IrisError;
 import crowplexus.hscript.Printer;
 #end
 
-class InitState extends flixel.FlxState
+class InitState extends backend.MusicBeatState
 {
     #if HSCRIPT_ALLOWED
     public var hscript:HScript;

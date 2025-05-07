@@ -1509,6 +1509,7 @@ class FunkinLua {
 		CustomSubstate.implement(this);
 		ShaderFunctions.implement(this);
 		DeprecatedFunctions.implement(this);
+		GifFunctions.implement(this);
 
 		try{
 			var isString:Bool = !FileSystem.exists(scriptName);

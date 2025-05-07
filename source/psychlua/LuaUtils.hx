@@ -344,6 +344,20 @@ class LuaUtils
 		}
 	}
 
+	public static function resetGifTag(tag:String) {
+		#if LUA_ALLOWED
+		if(!PlayState.instance.modchartGif.exists(tag)) {
+			return;
+		}
+
+		var target:ModchartGif = PlayState.instance.modchartGif.get(tag);
+		target.kill();
+		PlayState.instance.remove(target, true);
+		target.destroy();
+		PlayState.instance.modchartGif.remove(tag);
+		#end
+	}
+
 	public static function resetTextTag(tag:String) {
 		#if LUA_ALLOWED
 		if(!PlayState.instance.modchartTexts.exists(tag)) {

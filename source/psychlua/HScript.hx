@@ -174,7 +174,7 @@ class HScript extends Iris
 		set('Note', objects.Note);
 		set('CustomSubstate', CustomSubstate);
 		set('CustomState', CustomState);
-		set('CustomHelper', CustomHelper);
+		set('CustomScriptSubState', CustomScriptSubState); // reminder that CustomScriptSubState never work with CustomSubstate
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end
@@ -218,6 +218,18 @@ class HScript extends Iris
 				modName = this.modFolder;
 			}
 			return LuaUtils.getModSetting(saveTag, modName);
+		});
+		
+		set('openCustomSubState', function (name:String, ?stopUpdateFromState:Bool = false) {
+			if (stopUpdateFromState) {
+				MusicBeatState.getState().persistentDraw = MusicBeatState.getState().persistentUpdate = false;
+			} else {
+				MusicBeatState.getState().persistentDraw = MusicBeatState.getState().persistentUpdate = true;
+			}
+			return MusicBeatState.getState().openSubState(new CustomScriptSubState(name));
+		});
+		set('closeCustomSubState', function () {
+			return MusicBeatState.getState().closeSubState();
 		});
 
 		// Keyboard & Gamepads

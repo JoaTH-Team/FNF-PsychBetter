@@ -1,0 +1,5 @@
+package psychlua;
+
+class GifFunctions {
+    
+}

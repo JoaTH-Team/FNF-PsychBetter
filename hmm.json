@@ -28,6 +28,11 @@
       "url": "https://github.com/ShadowMario/flxanimate"
     },
     {
+      "name": "flxgif",
+      "type": "haxelib",
+      "version": null
+    },
+    {
       "name": "funkin.vis",
       "type": "git",
       "dir": null,

@@ -94,6 +94,7 @@
 	<!-- Psych Better stuff needed -->
 	<haxelib name="funkin.vis" version="git" />
 	<haxelib name="flxgif" version="1.0.3" />
+	<haxelib name="HxShaders" version="5.3.0" />
 
 	<!-- Disable Discord IO Thread -->
 	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="hxdiscord_rpc" />

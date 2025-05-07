@@ -176,7 +176,7 @@ class HScript extends Iris
 		set('CustomState', CustomState);
 		set('CustomScriptSubState', CustomScriptSubState); // reminder that CustomScriptSubState never work with CustomSubstate
 		#if (!flash && sys)
-		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
+		set('FlxRuntimeShader', FlxRuntimeShader);
 		#end
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
@@ -230,6 +230,14 @@ class HScript extends Iris
 		});
 		set('closeCustomSubState', function () {
 			return MusicBeatState.getState().closeSubState();
+		});
+
+		set('switchCustomState', function (name:String, ?switchByLoad:Bool = false) {
+			if (switchByLoad) {
+				return LoadingState.loadAndSwitchState(new CustomState(name));
+			} else {
+				return FlxG.switchState(new CustomState(name));
+			}
 		});
 
 		// Keyboard & Gamepads

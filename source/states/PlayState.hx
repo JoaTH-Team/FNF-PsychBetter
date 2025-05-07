@@ -33,7 +33,7 @@ import substates.PauseSubState;
 import substates.GameOverSubstate;
 
 #if !flash
-import flixel.addons.display.FlxRuntimeShader;
+import FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 #end
 

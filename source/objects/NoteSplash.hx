@@ -4,7 +4,7 @@ import backend.animation.PsychAnimationController;
 
 import shaders.RGBPalette;
 
-import flixel.system.FlxAssets.FlxShader;
+import FlxShader;
 import flixel.graphics.frames.FlxFrame;
 
 typedef NoteSplashConfig = {

@@ -128,6 +128,9 @@ class InitState extends flixel.FlxState
     {
         #if HSCRIPT_ALLOWED
         setOnScripts("game", this);
+        
+        @:privateAccess
+        setOnScripts("config", Main.game);
         #end
 
         #if HSCRIPT_ALLOWED

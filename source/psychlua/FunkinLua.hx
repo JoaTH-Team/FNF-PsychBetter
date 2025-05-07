@@ -13,7 +13,7 @@ import flixel.FlxObject;
 import flixel.addons.transition.FlxTransitionableState;
 
 #if (!flash && sys)
-import FlxRuntimeShader;
+import flixel.addons.display.FlxRuntimeShader;
 #end
 
 import cutscenes.DialogueBoxPsych;

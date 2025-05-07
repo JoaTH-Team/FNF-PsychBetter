@@ -1,6 +1,6 @@
 package shaders;
 
-import FlxShader;
+import flixel.system.FlxAssets.FlxShader;
 
 class ColorSwap {
 	public var shader(default, null):ColorSwapShader = new ColorSwapShader();

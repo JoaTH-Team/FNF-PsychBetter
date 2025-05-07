@@ -1,11 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "HxShaders",
-      "type": "haxelib",
-      "version": null
-    },
-    {
       "name": "flixel",
       "type": "haxelib",
       "version": "5.6.1"

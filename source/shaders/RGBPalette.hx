@@ -1,6 +1,6 @@
 package shaders;
 
-import FlxShader;
+import flixel.system.FlxAssets.FlxShader;
 import objects.Note;
 
 class RGBPalette {

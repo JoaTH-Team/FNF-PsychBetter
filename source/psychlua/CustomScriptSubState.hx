@@ -1,7 +1,7 @@
 package psychlua;
 
 #if !flash
-import FlxRuntimeShader;
+import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 #end
 

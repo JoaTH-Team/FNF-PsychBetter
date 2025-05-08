@@ -14,7 +14,7 @@ class GifFunctions {
 			var leGif:ModchartGif = new ModchartGif(x, y);
 			if(gif != null && gif.length > 0)
 			{
-				leGif.loadGraphic(Paths.gif(gif));
+				leGif.loadGif(Paths.gif(gif));
 			}
 			game.modchartGif.set(tag, leGif);
 			leGif.active = true;

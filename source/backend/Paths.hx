@@ -214,9 +214,9 @@ class Paths
 		return inst;
 	}
 
-	inline static public function gif(file:String, ?library:String) {
+	inline static public function gif(file:String) {
 		var gifPath:String = 'gif/$file.gif';
-		return getPath(gifPath, IMAGE, library);
+		return getPath(gifPath);
 	}
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];

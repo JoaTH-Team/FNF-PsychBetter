@@ -174,7 +174,6 @@ class HScript extends Iris
 		set('Note', objects.Note);
 		set('CustomSubstate', CustomSubstate);
 		set('CustomState', CustomState);
-		set('CustomScriptSubState', CustomScriptSubState); // reminder that CustomScriptSubState never work with CustomSubstate
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end
@@ -227,7 +226,7 @@ class HScript extends Iris
 			} else {
 				MusicBeatState.getState().persistentDraw = MusicBeatState.getState().persistentUpdate = true;
 			}
-			return MusicBeatState.getState().openSubState(new CustomScriptSubState(name));
+			return MusicBeatState.getState().openSubState(new CustomSubstate(name, MusicBeatState.getState()));
 		});
 		set('closeCustomSubState', function () {
 			return MusicBeatState.getState().closeSubState();

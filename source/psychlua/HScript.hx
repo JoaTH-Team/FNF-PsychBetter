@@ -185,6 +185,7 @@ class HScript extends Iris
 
 		// Some other used classes
 		set('FlxGifSprite', flxgif.FlxGifSprite);
+		set('BGSprite', objects.BGSprite);
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic) {
@@ -223,18 +224,18 @@ class HScript extends Iris
 		});
 		
 		// Soft-code switch state/open or closed custom state
-		set('openCustomSubState', function (name:String, ?checkBool:Array<Bool>) {
-			if (checkBool[0] != null) { // change presistent draw at [0, idk]
-				MusicBeatState.getState().persistentDraw = checkBool[0];
-			}
-
-			if (checkBool[1] != null) { // change presistent update at [idk, 1]
-				MusicBeatState.getState().persistentUpdate = checkBool[1];
-			}
-			return MusicBeatState.getState().openSubState(new CustomSubstate(name, MusicBeatState.getState()));
+		set('openCustomSubstate', function(name:String) {
+		    return MusicBeatState.getState().openSubState(new CustomSubstate(name, MusicBeatState.getState()));
 		});
-		set('closeCustomSubState', function () {
-			return MusicBeatState.getState().closeSubState();
+		set('closeCustomSubState', function() {
+			if (CustomSubstate.instance != null) {
+				CustomSubstate.instance.parentState.closeSubState();
+				// CustomSubstate.instance.clear();
+				// CustomSubstate.instance.destroy();
+				// CustomSubstate.instance.kill();
+				return true;
+			}
+			return false;
 		});
 
 		set('switchCustomState', function (name:String, ?switchWithLoad:Bool = false) {

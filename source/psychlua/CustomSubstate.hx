@@ -65,12 +65,15 @@ class CustomSubstate extends MusicBeatSubstate
         playState.setOnHScript('customSubstateName', name);
     }
 
-    public static function closeCustomSubstate()
+    public static function closeCustomSubstate():Bool
     {
-        if(instance != null && instance.parentState != null)
-        {
+        if (instance != null && instance.parentState != null) {
             instance.parentState.closeSubState();
-            instance = null;
+            instance.cameras = [];
+            instance.members = [];
+            instance.clear();
+            instance.destroy();
+            instance.kill();
             return true;
         }
         return false;
@@ -354,28 +357,42 @@ class CustomSubstate extends MusicBeatSubstate
         #end
     }
 
+    private var _destroying:Bool = false;
+
     override function destroy()
     {
-        if(parentState != null && Std.isOfType(parentState, PlayState))
-        {
-            var playState:PlayState = cast parentState;
-            playState.callOnScripts('onCustomSubstateDestroy', [name]);
-        }
+        // Prevent recursive destruction
+        if (_destroying) return;
+        _destroying = true;
         
         #if HSCRIPT_ALLOWED
         callOnScripts('onDestroy', []);
         #end
         
+        #if HSCRIPT_ALLOWED
+        if (hscript != null) {
+            hscript.destroy();
+            hscript = null;
+        }
+        #end
+        
+        #if sys
+        runtimeShaders.clear();
+        #end
+        
+        instance = null;
         name = 'unnamed';
-
-        if(parentState != null && Std.isOfType(parentState, PlayState))
-        {
+        
+        super.destroy();
+        
+        if (parentState != null && Std.isOfType(parentState, PlayState)) {
             var playState:PlayState = cast parentState;
             playState.setOnHScript('customSubstate', null);
             playState.setOnHScript('customSubstateName', name);
+            playState.callOnScripts('onCustomSubstateDestroy', [name]);
         }
         
-        super.destroy();
+        parentState = null;
     }
     
     public function new(name:String, parentState:MusicBeatState)

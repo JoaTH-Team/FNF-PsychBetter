@@ -5,7 +5,6 @@ Psych Better is a fork on a fork of psych engine
 * Custom State and Sub-State: You can finally code your own custom states/sub-states by scripting them
 * Modify Classes: Title State, Main Menu State, Story Menu,... are now able to moddable eyy
 * Some og content: Funkin Sound tray and stuff are there
-* GIF Images: You can you load your .gif file onto game by using both Lua or HScript
 
 ## Note:
 - For now, Custom State and Sub-State are only work with HScript, you can make your custom states work by put them on `mods/<your-mods>/states` or `mods/states`

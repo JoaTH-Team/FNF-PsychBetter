@@ -1,5 +1,6 @@
 package psychlua;
 
+import flixel.FlxState;
 import flixel.FlxObject;
 #if !flash
 import flixel.addons.display.FlxRuntimeShader;
@@ -28,7 +29,7 @@ class CustomSubstate extends MusicBeatSubstate
     #end
 
     // Reference to parent state to avoid direct PlayState.instance access
-    public var parentState:MusicBeatState;
+    public var parentState:FlxState;
 
     #if LUA_ALLOWED
     public static function implement(funk:FunkinLua)
@@ -74,6 +75,7 @@ class CustomSubstate extends MusicBeatSubstate
             instance.clear();
             instance.destroy();
             instance.kill();
+            instance.close();
             return true;
         }
         return false;
@@ -296,13 +298,11 @@ class CustomSubstate extends MusicBeatSubstate
             var playState:PlayState = cast parentState;
             playState.callOnScripts('onCustomSubstateCreate', [name]);
         }
-        
+
+        super.create();
+
         #if HSCRIPT_ALLOWED
         callOnScripts('onCreate', []);
-        super.create();
-        callOnScripts('onCreatePost', []);
-        #else
-        super.create();
         #end
         
         if(parentState != null && Std.isOfType(parentState, PlayState))
@@ -310,6 +310,10 @@ class CustomSubstate extends MusicBeatSubstate
             var playState:PlayState = cast parentState;
             playState.callOnScripts('onCustomSubstateCreatePost', [name]);
         }
+
+        #if HSCRIPT_ALLOWED
+        callOnScripts('onCreatePost', []);
+        #end
     }
     
     override function update(elapsed:Float)
@@ -319,13 +323,11 @@ class CustomSubstate extends MusicBeatSubstate
             var playState:PlayState = cast parentState;
             playState.callOnScripts('onCustomSubstateUpdate', [name, elapsed]);
         }
-        
+
+        super.update(elapsed);
+
         #if HSCRIPT_ALLOWED
         callOnScripts('onUpdate', [elapsed]);
-        super.update(elapsed);
-        callOnScripts('onUpdatePost', [elapsed]);
-        #else
-        super.update(elapsed);
         #end
         
         if(parentState != null && Std.isOfType(parentState, PlayState))
@@ -333,6 +335,10 @@ class CustomSubstate extends MusicBeatSubstate
             var playState:PlayState = cast parentState;
             playState.callOnScripts('onCustomSubstateUpdatePost', [name, elapsed]);
         }
+        
+        #if HSCRIPT_ALLOWED
+        callOnScripts('onUpdatePost', [elapsed]);
+        #end
     }
 
     override function beatHit()
@@ -395,7 +401,7 @@ class CustomSubstate extends MusicBeatSubstate
         parentState = null;
     }
     
-    public function new(name:String, parentState:MusicBeatState)
+    public function new(name:String, parentState:FlxState)
     {
         CustomSubstate.name = name;
         this.parentState = parentState;

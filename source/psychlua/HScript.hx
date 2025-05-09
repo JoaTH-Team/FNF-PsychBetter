@@ -224,15 +224,31 @@ class HScript extends Iris
 		});
 		
 		// Soft-code switch state/open or closed custom state
-		set('openCustomSubstate', function(name:String) {
-		    return MusicBeatState.getState().openSubState(new CustomSubstate(name, MusicBeatState.getState()));
+		set('openCustomSubstate', function(name:String, ?pauseGame:Bool = false) {
+			var currentState = FlxG.state;
+			if (currentState == null) return false;
+			
+			if (pauseGame && Std.isOfType(currentState, MusicBeatState)) {
+				var musicBeatState:MusicBeatState = cast currentState;
+				FlxG.camera.followLerp = 0;
+				musicBeatState.persistentUpdate = false;
+				musicBeatState.persistentDraw = true;
+				
+				if (FlxG.sound.music != null) {
+					FlxG.sound.music.pause();
+					if (Std.isOfType(currentState, PlayState)) {
+						var playState:PlayState = cast currentState;
+						if (playState.vocals != null) playState.vocals.pause();
+					}
+				}
+			}
+			
+			currentState.openSubState(new CustomSubstate(name, currentState));
+			return true;
 		});
 		set('closeCustomSubState', function() {
 			if (CustomSubstate.instance != null) {
 				CustomSubstate.instance.parentState.closeSubState();
-				// CustomSubstate.instance.clear();
-				// CustomSubstate.instance.destroy();
-				// CustomSubstate.instance.kill();
 				return true;
 			}
 			return false;

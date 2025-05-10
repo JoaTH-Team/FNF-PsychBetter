@@ -13,10 +13,34 @@ import crowplexus.hscript.Printer;
 #end
 
 class CustomState extends MusicBeatState {
+	public static var instance:CustomState;
+	#if LUA_ALLOWED public var lua:FunkinLua; #end
+
     #if HSCRIPT_ALLOWED
     public var hscript:HScript;
     public var instancesExclude:Array<String> = [];
     #end
+
+    #if LUA_ALLOWED
+	public function startLuasNamed(luaFile:String)
+	{
+		#if MODS_ALLOWED
+		var luaToLoad:String = Paths.modFolders(luaFile);
+		if(!FileSystem.exists(luaToLoad))
+			luaToLoad = Paths.getSharedPath(luaFile);
+
+		if(FileSystem.exists(luaToLoad))
+		#elseif sys
+		var luaToLoad:String = Paths.getSharedPath(luaFile);
+		if(OpenFlAssets.exists(luaToLoad))
+		#end
+		{
+			new FunkinLua(luaToLoad);
+			return true;
+		}
+		return false;
+	}
+	#end
     
     #if HSCRIPT_ALLOWED
     public function startHScriptsNamed(scriptFile:String)
@@ -57,15 +81,41 @@ class CustomState extends MusicBeatState {
     #end
     
     
-    public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
+	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
+		var returnVal:Dynamic = LuaUtils.Function_Continue;
+		if(args == null) args = [];
+		if(exclusions == null) exclusions = [];
+		if(excludeValues == null) excludeValues = [LuaUtils.Function_Continue];
+
+		var result:Dynamic = callOnLuas(funcToCall, args, ignoreStops, exclusions, excludeValues);
+		if(result == null || excludeValues.contains(result)) result = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
+		return result;
+	}
+
+    public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
         var returnVal:Dynamic = LuaUtils.Function_Continue;
+        #if LUA_ALLOWED
         if(args == null) args = [];
         if(exclusions == null) exclusions = [];
         if(excludeValues == null) excludeValues = [LuaUtils.Function_Continue];
-    
-        var result:Dynamic = null;
-        if(result == null || excludeValues.contains(result)) result = callOnHScript(funcToCall, args, ignoreStops, exclusions, excludeValues);
-        return result;
+
+        if(lua.closed)
+            return returnVal;
+
+        if(exclusions.contains(lua.scriptName))
+            return returnVal;
+
+        var myValue:Dynamic = lua.call(funcToCall, args);
+        if((myValue == LuaUtils.Function_StopLua || myValue == LuaUtils.Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
+        {
+            returnVal = myValue;
+        }
+        else if(myValue != null && !excludeValues.contains(myValue))
+        {
+            returnVal = myValue;
+        }
+        #end
+        return returnVal;
     }
     
     public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
@@ -113,6 +163,20 @@ class CustomState extends MusicBeatState {
         if(exclusions == null) exclusions = [];
         setOnHScript(variable, arg, exclusions);
     }
+
+    public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
+		#if LUA_ALLOWED
+		if(exclusions == null) exclusions = [];
+		// if(exclusions.contains(lua.scriptName))
+		// 	continue;
+        if (lua != null && !exclusions.contains(lua.scriptName))
+        {
+            if (!instancesExclude.contains(variable))
+                instancesExclude.push(variable);
+        }
+		lua.set(variable, arg);
+		#end
+	}
     
     public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null) {
         try {
@@ -140,7 +204,9 @@ class CustomState extends MusicBeatState {
 
         #if HSCRIPT_ALLOWED
         startHScriptsNamed('states/$file.hx');
+        startLuasNamed('states/$file.lua');
         #end
+        
         // idk why
         if (file != null) nameScripts = file;
         else nameScripts = "Nothing";

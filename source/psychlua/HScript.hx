@@ -258,7 +258,7 @@ class HScript extends Iris
 			if (switchWithLoad) {
 				return LoadingState.loadAndSwitchState(new CustomState(name));
 			} else {
-				return FlxG.switchState(new CustomState(name));
+				return MusicBeatState.switchState(new CustomState(name));
 			}
 		});
 

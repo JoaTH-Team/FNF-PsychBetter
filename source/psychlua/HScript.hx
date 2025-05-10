@@ -256,9 +256,9 @@ class HScript extends Iris
 
 		set('switchCustomState', function (name:String, ?switchWithLoad:Bool = false) {
 			if (switchWithLoad) {
-				return LoadingState.loadAndSwitchState(new CustomState(name));
+				LoadingState.loadAndSwitchState(new CustomState(name));
 			} else {
-				return MusicBeatState.switchState(new CustomState(name));
+				MusicBeatState.switchState(new CustomState(name));
 			}
 		});
 

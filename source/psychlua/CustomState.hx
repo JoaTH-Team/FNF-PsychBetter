@@ -138,9 +138,6 @@ class CustomState extends MusicBeatState {
     public function new(file:String) {
         super();
 
-        #if HSCRIPT_ALLOWED
-        startHScriptsNamed('states/$file.hx');
-        #end
         // idk why
         if (file != null) nameScripts = file;
         else nameScripts = "Nothing";
@@ -150,6 +147,10 @@ class CustomState extends MusicBeatState {
         #if DISCORD_ALLOWED
 		DiscordClient.changePresence("Custom States: " + nameScripts, null);
 		#end
+
+        #if HSCRIPT_ALLOWED
+        startHScriptsNamed('states/$nameScripts.hx');
+        #end
 
         #if HSCRIPT_ALLOWED
         setOnScripts("game", this);

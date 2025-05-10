@@ -402,6 +402,7 @@ class TitleState extends MusicBeatState
 
 	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
 	public static var closedState:Bool = false;
+	public var isIntroForCustom:Bool = false;
 
 	override function beatHit()
 	{
@@ -420,45 +421,47 @@ class TitleState extends MusicBeatState
 
 		if(!closedState) {
 			sickBeats++;
-			switch (sickBeats)
-			{
-				case 1:
-					//FlxG.sound.music.stop();
-					FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
-					FlxG.sound.music.fadeIn(4, 0, 0.7);
-				case 2:
-					createCoolText(['The', 'Funkin Crew Inc']);
-				case 4:
-					addMoreText('presents');
-				case 5:
-					deleteCoolText();
-				case 6:
-					createCoolText(['In association', 'with'], -40);
-				case 8:
-					addMoreText('newgrounds', -40);
-					ngSpr.visible = true;
-				case 9:
-					deleteCoolText();
-					ngSpr.visible = false;
-				case 10:
-					createCoolText([curWacky[0]]);
-				case 12:
-					addMoreText(curWacky[1]);
-				case 13:
-					deleteCoolText();
-				case 14:
-					addMoreText('Friday');
-				case 15:
-					// from vslice/base game:
-					// easter egg for when the game is trending with the wrong spelling
-					// the random intro text would be "trending--only on x"
-					if (curWacky[0] == "trending") addMoreText('Nigth');
-					else addMoreText('Night');
-				case 16:
-					addMoreText('Funkin');
-				case 17:
-					skipIntro();
-			}
+			if (!isIntroForCustom) {
+				switch (sickBeats)
+				{
+					case 1:
+						//FlxG.sound.music.stop();
+						FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+						FlxG.sound.music.fadeIn(4, 0, 0.7);
+					case 2:
+						createCoolText(['The', 'Funkin Crew Inc']);
+					case 4:
+						addMoreText('presents');
+					case 5:
+						deleteCoolText();
+					case 6:
+						createCoolText(['In association', 'with'], -40);
+					case 8:
+						addMoreText('newgrounds', -40);
+						ngSpr.visible = true;
+					case 9:
+						deleteCoolText();
+						ngSpr.visible = false;
+					case 10:
+						createCoolText([curWacky[0]]);
+					case 12:
+						addMoreText(curWacky[1]);
+					case 13:
+						deleteCoolText();
+					case 14:
+						addMoreText('Friday');
+					case 15:
+						// from vslice/base game:
+						// easter egg for when the game is trending with the wrong spelling
+						// the random intro text would be "trending--only on x"
+						if (curWacky[0] == "trending") addMoreText('Nigth');
+						else addMoreText('Night');
+					case 16:
+						addMoreText('Funkin');
+					case 17:
+						skipIntro();
+				}
+			} else {} // nothing, u gotta do it yourself
 		}
 
 		#if HSCRIPT_ALLOWED
@@ -489,7 +492,7 @@ class TitleState extends MusicBeatState
         #end
     }
 
-	function skipIntro():Void
+	public function skipIntro():Void
 	{
 		if (!skippedIntro)
 		{

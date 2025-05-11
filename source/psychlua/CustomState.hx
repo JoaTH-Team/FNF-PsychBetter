@@ -28,10 +28,10 @@ class CustomState extends MusicBeatState {
         StateScriptHandler.setState('$nameScripts', this);
         #end
 
-        // #if HSCRIPT_ALLOWED
-        // StateScriptHandler.setOnScripts("initLuaShader", initLuaShader);
-        // StateScriptHandler.setOnScripts("createRuntimeShader", createRuntimeShader);
-        // #end
+        #if (HSCRIPT_ALLOWED || LUA_ALLOWED)
+        StateScriptHandler.setOnScripts("initLuaShader", initLuaShader);
+        StateScriptHandler.setOnScripts("createRuntimeShader", createRuntimeShader);
+        #end
 
         #if (HSCRIPT_ALLOWED || LUA_ALLOWED)
         StateScriptHandler.callOnScripts('onCreate', []);

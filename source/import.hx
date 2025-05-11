@@ -4,6 +4,10 @@
 import backend.Discord;
 #end
 
+#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+import psychlua.StateScriptHandler;
+#end
+
 //Psych
 #if LUA_ALLOWED
 import llua.*;

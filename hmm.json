@@ -40,6 +40,13 @@
       "url": "https://github.com/FunkinCrew/funkVis"
     },
     {
+      "name": "grig.audio",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://gitlab.com/haxe-grig/grig.audio.git"
+    },
+    {
       "name": "hscript-iris",
       "type": "haxelib",
       "version": "1.1.3"

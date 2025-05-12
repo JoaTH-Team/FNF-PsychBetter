@@ -186,6 +186,8 @@ class HScript extends Iris
 		// Some other used classes
 		set('FlxGifSprite', flxgif.FlxGifSprite);
 		set('BGSprite', objects.BGSprite);
+		set('SpectralAnalyzer', funkin.vis.dsp.SpectralAnalyzer);
+		set('AudioDisplay', objects.AudioDisplay);
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic) {

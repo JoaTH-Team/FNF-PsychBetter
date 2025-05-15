@@ -16,20 +16,18 @@ import psychlua.LuaUtils;
 class GlobalScriptHandler {
     // Lua variables
     #if LUA_ALLOWED
-    public var luaArray:Array<FunkinLua> = [];
-    public var lua:FunkinLua; // Special/main Lua script
+    public static var luaArray:Array<FunkinLua> = [];
+    public static var lua:FunkinLua; // Special/main Lua script
     #end
     
     // HScript variables
     #if HSCRIPT_ALLOWED
-    public var hscriptArray:Array<HScript> = [];
-    public var hscript:HScript; // Special/main HScript
-    public var instancesExclude:Array<String> = [];
+    public static var hscriptArray:Array<HScript> = [];
+    public static var hscript:HScript; // Special/main HScript
+    public static var instancesExclude:Array<String> = [];
     #end
 
-    public function new() {}
-
-    public function setState(nameFile:String, stateInstance:Dynamic) {
+    public static function setState(nameFile:String, stateInstance:Dynamic) {
         #if HSCRIPT_ALLOWED
         startHScriptNamed('states/$nameFile.hx');
         #end
@@ -43,7 +41,7 @@ class GlobalScriptHandler {
 
     // HScript Functions
     #if HSCRIPT_ALLOWED
-    public function startHScriptNamed(scriptFile:String):Bool {
+    public static function startHScriptNamed(scriptFile:String):Bool {
         #if MODS_ALLOWED
         var scriptToLoad:String = Paths.modFolders(scriptFile);
         if(!FileSystem.exists(scriptToLoad))
@@ -59,7 +57,7 @@ class GlobalScriptHandler {
         return false;
     }
 
-    public function initHScript(file:String):Void {
+    public static function initHScript(file:String):Void {
         try {
             if(hscript != null) {
                 hscript.destroy();
@@ -83,7 +81,7 @@ class GlobalScriptHandler {
 
     // Lua Functions
     #if LUA_ALLOWED
-    public function startLuaNamed(luaFile:String):Bool {
+    public static function startLuaNamed(luaFile:String):Bool {
         #if MODS_ALLOWED
         var luaToLoad:String = Paths.modFolders(luaFile);
         if(!FileSystem.exists(luaToLoad))
@@ -105,7 +103,7 @@ class GlobalScriptHandler {
     #end
 
     // Combined Script Functions
-    public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
+    public static function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
         var returnVal:Dynamic = #if LUA_ALLOWED LuaUtils.Function_Continue; #else null; #end
         if(args == null) args = [];
         if(exclusions == null) exclusions = [];
@@ -127,7 +125,7 @@ class GlobalScriptHandler {
     }
 
     #if HSCRIPT_ALLOWED
-    public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
+    public static function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
         var returnVal:Dynamic = LuaUtils.Function_Continue;
         if(exclusions == null) exclusions = [];
         if(excludeValues == null) excludeValues = [LuaUtils.Function_Continue];
@@ -182,7 +180,7 @@ class GlobalScriptHandler {
     #end
 
     #if LUA_ALLOWED
-    public function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
+    public static function callOnLuas(funcToCall:String, args:Array<Dynamic> = null, ignoreStops = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic {
         var returnVal:Dynamic = LuaUtils.Function_Continue;
         if(args == null) args = [];
         if(exclusions == null) exclusions = [];
@@ -218,7 +216,7 @@ class GlobalScriptHandler {
     }
     #end
 
-    public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void {
+    public static function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void {
         if(exclusions == null) exclusions = [];
         #if HSCRIPT_ALLOWED
         setOnHScript(variable, arg, exclusions);
@@ -229,7 +227,7 @@ class GlobalScriptHandler {
     }
 
     #if HSCRIPT_ALLOWED
-    public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void {
+    public static function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void {
         if(exclusions == null) exclusions = [];
         if(hscript != null && !exclusions.contains(hscript.origin)) {
             if(!instancesExclude.contains(variable))
@@ -246,7 +244,7 @@ class GlobalScriptHandler {
     #end
 
     #if LUA_ALLOWED
-    public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void {
+    public static function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void {
         if(exclusions == null) exclusions = [];
         if(lua != null && !exclusions.contains(lua.scriptName)) {
             lua.set(variable, arg);
@@ -260,7 +258,7 @@ class GlobalScriptHandler {
     }
     #end
 
-    public function destroy():Void {
+    public static function destroy():Void {
         #if HSCRIPT_ALLOWED
         if(hscript != null) {
             hscript.destroy();

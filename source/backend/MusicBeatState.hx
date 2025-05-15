@@ -22,9 +22,8 @@ class MusicBeatState extends FlxState
 
 	var _psychCameraInitialized:Bool = false;
 
-	var globalScriptHandler:GlobalScriptHandler;
 	function getStateScript(name:String, stateGame:Dynamic) {
-		return globalScriptHandler.setState(name, stateGame);
+		return GlobalScriptHandler.setState('states/'+ name, stateGame);
 	}
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -37,7 +36,7 @@ class MusicBeatState extends FlxState
 
 		if(!_psychCameraInitialized) initPsychCamera();
 
-		globalScriptHandler.callOnScripts("onCreate", []);
+		GlobalScriptHandler.callOnScripts("onCreate", []);
 
 		super.create();
 
@@ -47,7 +46,7 @@ class MusicBeatState extends FlxState
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
 
-		globalScriptHandler.callOnScripts("onCreatePost", []);
+		GlobalScriptHandler.callOnScripts("onCreatePost", []);
 	}
 
 	public function initPsychCamera():PsychCamera
@@ -70,7 +69,7 @@ class MusicBeatState extends FlxState
 		updateCurStep();
 		updateBeat();
 
-		globalScriptHandler.callOnScripts("onUpdate", [elapsed]);
+		GlobalScriptHandler.callOnScripts("onUpdate", [elapsed]);
 
 		if (oldStep != curStep)
 		{
@@ -94,7 +93,7 @@ class MusicBeatState extends FlxState
 
 		super.update(elapsed);
 
-		globalScriptHandler.callOnScripts("onUpdatePost", [elapsed]);
+		GlobalScriptHandler.callOnScripts("onUpdatePost", [elapsed]);
 	}
 
 	private function updateSection():Void
@@ -108,7 +107,7 @@ class MusicBeatState extends FlxState
 			sectionHit();
 		}
 
-		globalScriptHandler.callOnScripts("onUpdateSection", []);
+		GlobalScriptHandler.callOnScripts("onUpdateSection", []);
 	}
 
 	private function rollbackSection():Void
@@ -129,7 +128,7 @@ class MusicBeatState extends FlxState
 			}
 		}
 
-		globalScriptHandler.callOnScripts("onRollbackSection", []);
+		GlobalScriptHandler.callOnScripts("onRollbackSection", []);
 		if(curSection > lastSection) sectionHit();
 	}
 
@@ -138,7 +137,7 @@ class MusicBeatState extends FlxState
 		curBeat = Math.floor(curStep / 4);
 		curDecBeat = curDecStep/4;
 
-		globalScriptHandler.callOnScripts("onUpdateBeat", []);
+		GlobalScriptHandler.callOnScripts("onUpdateBeat", []);
 	}
 
 	private function updateCurStep():Void
@@ -149,7 +148,7 @@ class MusicBeatState extends FlxState
 		curDecStep = lastChange.stepTime + shit;
 		curStep = lastChange.stepTime + Math.floor(shit);
 
-		globalScriptHandler.callOnScripts("onUpdateCurStep", []);
+		GlobalScriptHandler.callOnScripts("onUpdateCurStep", []);
 	}
 
 	public static function switchState(nextState:FlxState = null) {
@@ -210,7 +209,7 @@ class MusicBeatState extends FlxState
 			stage.beatHit();
 		});
 
-		globalScriptHandler.callOnScripts("onBeatHit", []);
+		GlobalScriptHandler.callOnScripts("onBeatHit", []);
 	}
 
 	public function sectionHit():Void
@@ -221,7 +220,7 @@ class MusicBeatState extends FlxState
 			stage.sectionHit();
 		});
 
-		globalScriptHandler.callOnScripts("onStepHit", []);
+		GlobalScriptHandler.callOnScripts("onStepHit", []);
 	}
 
 	function stagesFunc(func:BaseStage->Void)

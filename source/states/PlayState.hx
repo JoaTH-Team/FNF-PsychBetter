@@ -266,6 +266,12 @@ class PlayState extends MusicBeatState
 
 	private static var _lastLoadedModDirectory:String = '';
 	public static var nextReloadAll:Bool = false;
+
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override public function create()
 	{
 		//trace('Playback Rate: ' + playbackRate);

@@ -64,6 +64,11 @@ class TitleState extends MusicBeatState
 	var easterEggKeysBuffer:String = '';
 	#end
 
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override public function create():Void
 	{
 		Paths.clearStoredMemory();

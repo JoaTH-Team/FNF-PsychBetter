@@ -17,6 +17,11 @@ class CreditsState extends MusicBeatState
 
 	var offsetThing:Float = -75;
 
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override function create()
 	{
 		#if DISCORD_ALLOWED

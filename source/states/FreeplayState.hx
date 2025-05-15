@@ -52,6 +52,11 @@ class FreeplayState extends MusicBeatState
 
 	var player:MusicPlayer;
 
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override function create()
 	{
 		//Paths.clearStoredMemory();

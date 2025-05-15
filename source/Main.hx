@@ -73,6 +73,7 @@ class Main extends Sprite
 
 		#if (cpp && windows)
 		backend.Native.fixScaling();
+		backend.Native.darkMode(true);
 		#end
 
 		// Credits to MAJigsaw77 (he's the og author for this code)
@@ -161,10 +162,16 @@ class Main extends Sprite
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+		Lib.current.stage.quality = HIGH;
 		if(fpsVar != null) {
 			fpsVar.visible = ClientPrefs.data.showFPS;
 		}
 		#end
+
+		var funkinSoundTray = new debug.FunkinSoundTray();
+		addChild(funkinSoundTray);
+		Lib.current.stage.align = "tl";
+		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
 
 		#if (linux || mac) // fix the app icon not showing up on the Linux Panel / Mac Dock
 		var icon = Image.fromFile("icon.png");
@@ -182,6 +189,9 @@ class Main extends Sprite
 		
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
+		#if cpp
+		untyped __global__.__hxcpp_set_critical_error_handler(onCrash);
+		#end
 		#end
 
 		#if DISCORD_ALLOWED
@@ -239,7 +249,7 @@ class Main extends Sprite
 		// remove if you're modding and want the crash log message to contain the link
 		// please remember to actually modify the link for the github page to report the issues to.
 		#if officialBuild
-		errMsg += "\nPlease report this error to the GitHub page: https://github.com/ShadowMario/FNF-PsychEngine";
+		errMsg += "\nPlease report this error to the GitHub page: https://github.com/JoaTH-Team/FNF-PsychBetter";
 		#end
 		errMsg += "\n\n> Crash Handler written by: sqirra-rng";
 

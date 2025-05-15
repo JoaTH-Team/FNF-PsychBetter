@@ -38,6 +38,12 @@ class MainMenuState extends MusicBeatState
 	var camFollow:FlxObject;
 
 	static var showOutdatedWarning:Bool = true;
+
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override function create()
 	{
 		super.create();

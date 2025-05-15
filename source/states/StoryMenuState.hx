@@ -43,6 +43,11 @@ class StoryMenuState extends MusicBeatState
 
 	var loadedWeeks:Array<WeekData> = [];
 
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override function create()
 	{
 		Paths.clearStoredMemory();

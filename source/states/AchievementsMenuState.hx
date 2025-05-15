@@ -20,6 +20,11 @@ class AchievementsMenuState extends MusicBeatState
 
 	var MAX_PER_ROW:Int = 4;
 
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override function create()
 	{
 		Paths.clearStoredMemory();

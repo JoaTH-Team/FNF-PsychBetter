@@ -13,6 +13,8 @@ class ErrorState extends MusicBeatState
 		this.backCallback = back;
 
 		super();
+		
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
 	}
 
 	public var errorSine:Float = 0;

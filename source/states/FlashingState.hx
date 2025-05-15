@@ -13,6 +13,11 @@ class FlashingState extends MusicBeatState
 	var texts:FlxTypedSpriteGroup<FlxText>;
 	var bg:FlxSprite;
 
+	public function new() {
+		super();
+		getStateScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
+
 	override function create()
 	{
 		super.create();

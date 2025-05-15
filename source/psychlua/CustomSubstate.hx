@@ -22,15 +22,20 @@ class CustomSubstate extends MusicBeatSubstate
 		if(pauseGame)
 		{
 			FlxG.camera.followLerp = 0;
-			PlayState.instance.persistentUpdate = false;
-			PlayState.instance.persistentDraw = true;
-			PlayState.instance.paused = true;
+			FlxG.state.persistentDraw = true;
+			FlxG.state.persistentUpdate = false;
+
+			if (PlayState.instance != null) {
+				PlayState.instance.persistentUpdate = false;
+				PlayState.instance.persistentDraw = true;
+				PlayState.instance.paused = true;
+			}
 			if(FlxG.sound.music != null) {
 				FlxG.sound.music.pause();
 				PlayState.instance.vocals.pause();
 			}
 		}
-		PlayState.instance.openSubState(new CustomSubstate(name));
+		MusicBeatState.getState().openSubState(new CustomSubstate(name));
 	}
 
 	public static function closeCustomSubstate()

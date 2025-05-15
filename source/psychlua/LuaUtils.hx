@@ -259,7 +259,13 @@ class LuaUtils
 	{
 		return #if LUA_ALLOWED PlayState.instance.modchartTexts.exists(name) ? PlayState.instance.modchartTexts.get(name) : #end Reflect.getProperty(PlayState.instance, name);
 	}
-	
+
+	// JUST FOR THE OTHER STATES, NOT PLAY STATE
+	inline public static function getTextObject_Other(name:String):FlxText
+	{
+		return #if LUA_ALLOWED StoreLuaVariable.modchartTexts.exists(name) ? StoreLuaVariable.modchartTexts.get(name) : #end Reflect.getProperty(MusicBeatState.getState(), name);
+	}
+
 	public static function isOfTypes(value:Any, types:Array<Dynamic>)
 	{
 		for (type in types)
@@ -272,9 +278,18 @@ class LuaUtils
 	public static function isLuaSupported(value:Any):Bool 
 		return (value == null || isOfTypes(value, [Bool, Int, Float, String, Array]) || Type.typeof(value) == ValueType.TObject);
 	
-	public static inline function getTargetInstance()
+	public static function getTargetInstance():Dynamic
 	{
-		return PlayState.instance.isDead ? GameOverSubstate.instance : PlayState.instance;
+	    var currentState = FlxG.state.subState != null ? FlxG.state.subState : FlxG.state;
+	
+	    if (Std.isOfType(currentState, PlayState))
+	    {
+	        var playState:PlayState = cast currentState;
+	        if (playState.isDead)
+	            return GameOverSubstate.instance;
+	    }
+	
+	    return currentState;
 	}
 
 	public static inline function getLowestCharacterGroup():FlxSpriteGroup

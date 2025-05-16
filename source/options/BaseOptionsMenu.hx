@@ -71,14 +71,14 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 		for (i in 0...optionsArray.length)
 		{
-			var optionText:Alphabet = new Alphabet(220, 260, optionsArray[i].name, false);
+			var optionText:Alphabet = new Alphabet(290, 260, optionsArray[i].name, false);
 			optionText.isMenuItem = true;
 			/*optionText.forceX = 300;
 			optionText.yMult = 90;*/
 			optionText.targetY = i;
 			grpOptions.add(optionText);
 
-			if(optionsArray[i].type == BOOL)
+			if(optionsArray[i].type == 'bool')
 			{
 				var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, Std.string(optionsArray[i].getValue()) == 'true');
 				checkbox.sprTracker = optionText;
@@ -146,18 +146,20 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 		if(nextAccept <= 0)
 		{
-			switch(curOption.type)
+			if(curOption.type == 'bool')
 			{
-				case BOOL:
-					if(controls.ACCEPT)
-					{
-						FlxG.sound.play(Paths.sound('scrollMenu'));
-						curOption.setValue((curOption.getValue() == true) ? false : true);
-						curOption.change();
-						reloadCheckboxes();
-					}
-
-				case KEYBIND:
+				if(controls.ACCEPT)
+				{
+					FlxG.sound.play(Paths.sound('scrollMenu'));
+					curOption.setValue((curOption.getValue() == true) ? false : true);
+					curOption.change();
+					reloadCheckboxes();
+				}
+			}
+			else
+			{
+				if(curOption.type == 'keybind')
+				{
 					if(controls.ACCEPT)
 					{
 						bindingBlack = new FlxSprite().makeGraphic(1, 1, FlxColor.WHITE);
@@ -167,11 +169,11 @@ class BaseOptionsMenu extends MusicBeatSubstate
 						FlxTween.tween(bindingBlack, {alpha: 0.6}, 0.35, {ease: FlxEase.linear});
 						add(bindingBlack);
 	
-						bindingText = new Alphabet(FlxG.width / 2, 160, Language.getPhrase('controls_rebinding', 'Rebinding {1}', [curOption.name]), false);
+						bindingText = new Alphabet(FlxG.width / 2, 160, "Rebinding " + curOption.name, false);
 						bindingText.alignment = CENTERED;
 						add(bindingText);
 						
-						bindingText2 = new Alphabet(FlxG.width / 2, 340, Language.getPhrase('controls_rebinding2', 'Hold ESC to Cancel\nHold Backspace to Delete'), true);
+						bindingText2 = new Alphabet(FlxG.width / 2, 340, "Hold ESC to Cancel\nHold Backspace to Delete", true);
 						bindingText2.alignment = CENTERED;
 						add(bindingText2);
 	
@@ -180,97 +182,92 @@ class BaseOptionsMenu extends MusicBeatSubstate
 						ClientPrefs.toggleVolumeKeys(false);
 						FlxG.sound.play(Paths.sound('scrollMenu'));
 					}
-
-				default:
-					if(controls.UI_LEFT || controls.UI_RIGHT)
+				}
+				else if(controls.UI_LEFT || controls.UI_RIGHT)
+				{
+					var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
+					if(holdTime > 0.5 || pressed)
 					{
-						var pressed = (controls.UI_LEFT_P || controls.UI_RIGHT_P);
-						if(holdTime > 0.5 || pressed)
+						if(pressed)
 						{
-							if(pressed)
+							var add:Dynamic = null;
+							if(curOption.type != 'string')
+								add = controls.UI_LEFT ? -curOption.changeValue : curOption.changeValue;
+
+							switch(curOption.type)
 							{
-								var add:Dynamic = null;
-								if(curOption.type != STRING)
-									add = controls.UI_LEFT ? -curOption.changeValue : curOption.changeValue;
-		
-								switch(curOption.type)
-								{
-									case INT, FLOAT, PERCENT:
-										holdValue = curOption.getValue() + add;
-										if(holdValue < curOption.minValue) holdValue = curOption.minValue;
-										else if (holdValue > curOption.maxValue) holdValue = curOption.maxValue;
-		
-										if(curOption.type == INT)
-										{
+								case 'int' | 'float' | 'percent':
+									holdValue = curOption.getValue() + add;
+									if(holdValue < curOption.minValue) holdValue = curOption.minValue;
+									else if (holdValue > curOption.maxValue) holdValue = curOption.maxValue;
+
+									switch(curOption.type)
+									{
+										case 'int':
 											holdValue = Math.round(holdValue);
 											curOption.setValue(holdValue);
-										}
-										else
-										{
+
+										case 'float' | 'percent':
 											holdValue = FlxMath.roundDecimal(holdValue, curOption.decimals);
 											curOption.setValue(holdValue);
-										}
-		
-									case STRING:
-										var num:Int = curOption.curOption; //lol
-										if(controls.UI_LEFT_P) --num;
-										else num++;
-		
-										if(num < 0)
-											num = curOption.options.length - 1;
-										else if(num >= curOption.options.length)
-											num = 0;
-		
-										curOption.curOption = num;
-										curOption.setValue(curOption.options[num]);
-										//trace(curOption.options[num]);
+									}
 
-									default:
-								}
-								updateTextFrom(curOption);
-								curOption.change();
-								FlxG.sound.play(Paths.sound('scrollMenu'));
-							}
-							else if(curOption.type != STRING)
-							{
-								holdValue += curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1);
-								if(holdValue < curOption.minValue) holdValue = curOption.minValue;
-								else if (holdValue > curOption.maxValue) holdValue = curOption.maxValue;
-		
-								switch(curOption.type)
-								{
-									case INT:
-										curOption.setValue(Math.round(holdValue));
-									
-									case PERCENT:
-										curOption.setValue(FlxMath.roundDecimal(holdValue, curOption.decimals));
+								case 'string':
+									var num:Int = curOption.curOption; //lol
+									if(controls.UI_LEFT_P) --num;
+									else num++;
 
-									default:
-								}
-								updateTextFrom(curOption);
-								curOption.change();
+									if(num < 0)
+										num = curOption.options.length - 1;
+									else if(num >= curOption.options.length)
+										num = 0;
+
+									curOption.curOption = num;
+									curOption.setValue(curOption.options[num]); //lol
+									//trace(curOption.options[num]);
 							}
+							updateTextFrom(curOption);
+							curOption.change();
+							FlxG.sound.play(Paths.sound('scrollMenu'));
 						}
-		
-						if(curOption.type != STRING)
-							holdTime += elapsed;
+						else if(curOption.type != 'string')
+						{
+							holdValue += curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1);
+							if(holdValue < curOption.minValue) holdValue = curOption.minValue;
+							else if (holdValue > curOption.maxValue) holdValue = curOption.maxValue;
+
+							switch(curOption.type)
+							{
+								case 'int':
+									curOption.setValue(Math.round(holdValue));
+								
+								case 'float' | 'percent':
+									curOption.setValue(FlxMath.roundDecimal(holdValue, curOption.decimals));
+							}
+							updateTextFrom(curOption);
+							curOption.change();
+						}
 					}
-					else if(controls.UI_LEFT_R || controls.UI_RIGHT_R)
-					{
-						if(holdTime > 0.5) FlxG.sound.play(Paths.sound('scrollMenu'));
-						holdTime = 0;
-					}
+
+					if(curOption.type != 'string')
+						holdTime += elapsed;
+				}
+				else if(controls.UI_LEFT_R || controls.UI_RIGHT_R)
+				{
+					if(holdTime > 0.5) FlxG.sound.play(Paths.sound('scrollMenu'));
+					holdTime = 0;
+				}
 			}
 
 			if(controls.RESET)
 			{
 				var leOption:Option = optionsArray[curSelected];
-				if(leOption.type != KEYBIND)
+				if(leOption.type != 'keybind')
 				{
 					leOption.setValue(leOption.defaultValue);
-					if(leOption.type != BOOL)
+					if(leOption.type != 'bool')
 					{
-						if(leOption.type == STRING) leOption.curOption = leOption.options.indexOf(leOption.getValue());
+						if(leOption.type == 'string') leOption.curOption = leOption.options.indexOf(leOption.getValue());
 						updateTextFrom(leOption);
 					}
 				}
@@ -459,7 +456,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 	}
 
 	function updateTextFrom(option:Option) {
-		if(option.type == KEYBIND)
+		if(option.type == 'keybind')
 		{
 			updateBind(option);
 			return;
@@ -467,22 +464,30 @@ class BaseOptionsMenu extends MusicBeatSubstate
 
 		var text:String = option.displayFormat;
 		var val:Dynamic = option.getValue();
-		if(option.type == PERCENT) val *= 100;
+		if(option.type == 'percent') val *= 100;
 		var def:Dynamic = option.defaultValue;
 		option.text = text.replace('%v', val).replace('%d', def);
 	}
 	
 	function changeSelection(change:Int = 0)
 	{
-		curSelected = FlxMath.wrap(curSelected + change, 0, optionsArray.length - 1);
+		curSelected += change;
+		if (curSelected < 0)
+			curSelected = optionsArray.length - 1;
+		else if (curSelected >= optionsArray.length)
+			curSelected = 0;
 
 		descText.text = optionsArray[curSelected].description;
 		descText.screenCenter(Y);
 		descText.y += 270;
 
-		for (num => item in grpOptions.members)
+		var bullShit:Int = 0;
+
+		for (item in grpOptions.members)
 		{
-			item.targetY = num - curSelected;
+			item.targetY = bullShit - curSelected;
+			bullShit++;
+
 			item.alpha = 0.6;
 			if (item.targetY == 0) item.alpha = 1;
 		}

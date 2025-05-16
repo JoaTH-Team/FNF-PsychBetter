@@ -5,45 +5,33 @@ import backend.StageData;
 
 class OptionsState extends MusicBeatState
 {
-	var options:Array<String> = [
-		'Note Colors',
-		'Controls',
-		'Adjust Delay and Combo',
-		'Graphics',
-		'Visuals',
-		'Gameplay'
-		#if TRANSLATIONS_ALLOWED , 'Language' #end
-	];
+	var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private static var curSelected:Int = 0;
 	public static var menuBG:FlxSprite;
 	public static var onPlayState:Bool = false;
 
 	function openSelectedSubstate(label:String) {
-		switch(label)
-		{
+		switch(label) {
 			case 'Note Colors':
-				openSubState(new options.NotesColorSubState());
+				openSubState(new options.NotesSubState());
 			case 'Controls':
 				openSubState(new options.ControlsSubState());
 			case 'Graphics':
 				openSubState(new options.GraphicsSettingsSubState());
-			case 'Visuals':
-				openSubState(new options.VisualsSettingsSubState());
+			case 'Visuals and UI':
+				openSubState(new options.VisualsUISubState());
 			case 'Gameplay':
 				openSubState(new options.GameplaySettingsSubState());
 			case 'Adjust Delay and Combo':
 				MusicBeatState.switchState(new options.NoteOffsetState());
-			case 'Language':
-				openSubState(new options.LanguageSubState());
 		}
 	}
 
 	var selectorLeft:Alphabet;
 	var selectorRight:Alphabet;
 
-	override function create()
-	{
+	override function create() {
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Options Menu", null);
 		#end
@@ -59,11 +47,11 @@ class OptionsState extends MusicBeatState
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);
 
-		for (num => option in options)
+		for (i in 0...options.length)
 		{
-			var optionText:Alphabet = new Alphabet(0, 0, Language.getPhrase('options_$option', option), true);
+			var optionText:Alphabet = new Alphabet(0, 0, options[i], true);
 			optionText.screenCenter();
-			optionText.y += (92 * (num - (options.length / 2))) + 45;
+			optionText.y += (100 * (i - (options.length / 2))) + 50;
 			grpOptions.add(optionText);
 		}
 
@@ -78,8 +66,7 @@ class OptionsState extends MusicBeatState
 		super.create();
 	}
 
-	override function closeSubState()
-	{
+	override function closeSubState() {
 		super.closeSubState();
 		ClientPrefs.saveSettings();
 		#if DISCORD_ALLOWED
@@ -90,13 +77,14 @@ class OptionsState extends MusicBeatState
 	override function update(elapsed:Float) {
 		super.update(elapsed);
 
-		if (controls.UI_UP_P)
+		if (controls.UI_UP_P) {
 			changeSelection(-1);
-		if (controls.UI_DOWN_P)
+		}
+		if (controls.UI_DOWN_P) {
 			changeSelection(1);
+		}
 
-		if (controls.BACK)
-		{
+		if (controls.BACK) {
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			if(onPlayState)
 			{
@@ -109,16 +97,21 @@ class OptionsState extends MusicBeatState
 		else if (controls.ACCEPT) openSelectedSubstate(options[curSelected]);
 	}
 	
-	function changeSelection(change:Int = 0)
-	{
-		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
+	function changeSelection(change:Int = 0) {
+		curSelected += change;
+		if (curSelected < 0)
+			curSelected = options.length - 1;
+		if (curSelected >= options.length)
+			curSelected = 0;
 
-		for (num => item in grpOptions.members)
-		{
-			item.targetY = num - curSelected;
+		var bullShit:Int = 0;
+
+		for (item in grpOptions.members) {
+			item.targetY = bullShit - curSelected;
+			bullShit++;
+
 			item.alpha = 0.6;
-			if (item.targetY == 0)
-			{
+			if (item.targetY == 0) {
 				item.alpha = 1;
 				selectorLeft.x = item.x - 63;
 				selectorLeft.y = item.y;

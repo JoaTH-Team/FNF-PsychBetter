@@ -6,6 +6,8 @@ import openfl.utils.Assets;
 import objects.TypedAlphabet;
 import cutscenes.DialogueCharacter;
 
+// Gonna try to kind of make it compatible to Forever Engine,
+// love u Shubs no homo :flushedh4:
 typedef DialogueFile = {
 	var dialogue:Array<DialogueLine>;
 }
@@ -16,7 +18,7 @@ typedef DialogueLine = {
 	var text:Null<String>;
 	var boxState:Null<String>;
 	var speed:Null<Float>;
-	@:optional var sound:Null<String>;
+	var sound:Null<String>;
 }
 
 // TO DO: Clean code? Maybe? idk
@@ -41,7 +43,6 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	var currentText:Int = 0;
 	var offsetPos:Float = -600;
-	var skipText:FlxText;
 
 	var textBoxTypes:Array<String> = ['normal', 'angry'];
 	
@@ -91,11 +92,6 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		daText = new TypedAlphabet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, '');
 		daText.setScale(0.7);
 		add(daText);
-
-		skipText = new FlxText(FlxG.width - 320, FlxG.height - 30, 300, Language.getPhrase('dialogue_skip', 'Press BACK to Skip'), 16);
-		skipText.setFormat(null, 16, FlxColor.WHITE, RIGHT, OUTLINE_FAST, FlxColor.BLACK);
-		skipText.borderSize = 2;
-		add(skipText);
 
 		startNextDialog();
 	}
@@ -166,17 +162,13 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			bgFade.alpha += 0.5 * elapsed;
 			if(bgFade.alpha > 0.5) bgFade.alpha = 0.5;
 
-			var back:Bool = Controls.instance.BACK;
-			if(Controls.instance.ACCEPT || back) {
-				if(!daText.finishedText && !back)
-				{
+			if(Controls.instance.ACCEPT) {
+				if(!daText.finishedText) {
 					daText.finishText();
 					if(skipDialogueThing != null) {
 						skipDialogueThing();
 					}
-				}
-				else if(back || currentText >= dialogueList.dialogue.length)
-				{
+				} else if(currentText >= dialogueList.dialogue.length) {
 					dialogueEnded = true;
 					for (i in 0...textBoxTypes.length) {
 						var checkArray:Array<String> = ['', 'center-'];
@@ -196,9 +188,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 						remove(daText);
 						daText.destroy();
 					}
-					skipText.visible = false;
 					updateBoxOffsets(box);
-					FlxG.sound.music.fadeOut(1, 0, (_) -> FlxG.sound.music.stop());
+					FlxG.sound.music.fadeOut(1, 0);
 				} else {
 					startNextDialog();
 				}
@@ -383,25 +374,14 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		}
 	}
 
-	inline public static function parseDialogue(path:String):DialogueFile {
+	public static function parseDialogue(path:String):DialogueFile {
 		#if MODS_ALLOWED
-		return cast (FileSystem.exists(path)) ? Json.parse(File.getContent(path)) : dummy();
-		#else
-		return cast (Assets.exists(path, TEXT)) ? Json.parse(Assets.getText(path)) : dummy();
+		if(FileSystem.exists(path))
+		{
+			return cast Json.parse(File.getContent(path));
+		}
 		#end
-	}
-
-	inline public static function dummy():DialogueFile
-	{
-		return { dialogue: [
-			{
-				expression: "talk",
-				text: "DIALOGUE NOT FOUND",
-				boxState: "normal",
-				speed: 0.05,
-				portrait: "bf"
-			}
-		]};
+		return cast Json.parse(Assets.getText(path));
 	}
 
 	public static function updateBoxOffsets(box:FlxSprite) { //Had to make it static because of the editors

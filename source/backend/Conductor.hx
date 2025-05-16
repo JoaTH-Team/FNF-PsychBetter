@@ -1,6 +1,7 @@
 package backend;
 
 import backend.Song;
+import backend.Section;
 import objects.Note;
 
 typedef BPMChangeEvent =

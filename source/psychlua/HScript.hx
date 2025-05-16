@@ -17,6 +17,7 @@ import crowplexus.hscript.Printer;
 
 import haxe.ValueException;
 
+
 typedef HScriptInfos = {
 	> haxe.PosInfos,
 	var ?funcName:String;
@@ -49,7 +50,8 @@ class HScript extends Iris
 		if(hs == null)
 		{
 			trace('initializing haxe interp for: ${parent.scriptName}');
-			try {
+			try
+			{
 				parent.hscript = new HScript(parent, code, varsToBring);
 			}
 			catch(e:IrisError) {
@@ -138,7 +140,7 @@ class HScript extends Iris
 		}
 	}
 
-	var varsToBring(default, set):Any = null;
+	var varsToBring:Any = null;
 	override function preset() {
 		super.preset();
 
@@ -151,7 +153,6 @@ class HScript extends Iris
 		set('FlxG', flixel.FlxG);
 		set('FlxMath', flixel.math.FlxMath);
 		set('FlxSprite', flixel.FlxSprite);
-		set('FlxText', flixel.text.FlxText);
 		set('FlxCamera', flixel.FlxCamera);
 		set('PsychCamera', backend.PsychCamera);
 		set('FlxTimer', flixel.util.FlxTimer);
@@ -172,7 +173,6 @@ class HScript extends Iris
 		set('CustomSubstate', CustomSubstate);
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
-		set('ErrorHandledRuntimeShader', shaders.ErrorHandledShader.ErrorHandledRuntimeShader);
 		#end
 		set('ShaderFilter', openfl.filters.ShaderFilter);
 		set('StringTools', StringTools);
@@ -182,19 +182,19 @@ class HScript extends Iris
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic) {
-			MusicBeatState.getVariables().set(name, value);
+			PlayState.instance.variables.set(name, value);
 			return value;
 		});
 		set('getVar', function(name:String) {
 			var result:Dynamic = null;
-			if(MusicBeatState.getVariables().exists(name)) result = MusicBeatState.getVariables().get(name);
+			if(PlayState.instance.variables.exists(name)) result = PlayState.instance.variables.get(name);
 			return result;
 		});
 		set('removeVar', function(name:String)
 		{
-			if(MusicBeatState.getVariables().exists(name))
+			if(PlayState.instance.variables.exists(name))
 			{
-				MusicBeatState.getVariables().remove(name);
+				PlayState.instance.variables.remove(name);
 				return true;
 			}
 			return false;
@@ -208,7 +208,7 @@ class HScript extends Iris
 			{
 				if(this.modFolder == null)
 				{
-					Iris.error('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', this.interp.posInfos());
+					PlayState.instance.addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
 					return null;
 				}
 				modName = this.modFolder;
@@ -312,8 +312,8 @@ class HScript extends Iris
 		{
 			if(funk == null) funk = parentLua;
 			
-			if(funk != null) funk.addLocalCallback(name, func);
-			else Iris.error('createCallback ($name): 3rd argument is null', this.interp.posInfos());
+			if(parentLua != null) funk.addLocalCallback(name, func);
+			else FunkinLua.luaTrace('createCallback ($name): 3rd argument is null', false, false, FlxColor.RED);
 		});
 		#end
 
@@ -347,6 +347,27 @@ class HScript extends Iris
 		set('Function_StopLua', LuaUtils.Function_StopLua); //doesnt do much cuz HScript has a lower priority than Lua
 		set('Function_StopHScript', LuaUtils.Function_StopHScript);
 		set('Function_StopAll', LuaUtils.Function_StopAll);
+		
+		set('add', FlxG.state.add);
+		set('insert', FlxG.state.insert);
+		set('remove', FlxG.state.remove);
+
+		if(PlayState.instance == FlxG.state)
+		{
+			set('addBehindGF', PlayState.instance.addBehindGF);
+			set('addBehindDad', PlayState.instance.addBehindDad);
+			set('addBehindBF', PlayState.instance.addBehindBF);
+		}
+
+		if(varsToBring != null) {
+			for (key in Reflect.fields(varsToBring)) {
+				key = key.trim();
+				var value = Reflect.field(varsToBring, key);
+				//trace('Key $key: $value');
+				set(key, Reflect.field(varsToBring, key));
+			}
+			varsToBring = null;
+		}
 	}
 
 	#if LUA_ALLOWED
@@ -504,25 +525,36 @@ class CustomFlxColor {
 	public static var CYAN(default, null):Int = FlxColor.CYAN;
 
 	public static function fromInt(Value:Int):Int 
+	{
 		return cast FlxColor.fromInt(Value);
+	}
 
 	public static function fromRGB(Red:Int, Green:Int, Blue:Int, Alpha:Int = 255):Int
+	{
 		return cast FlxColor.fromRGB(Red, Green, Blue, Alpha);
-
+	}
 	public static function fromRGBFloat(Red:Float, Green:Float, Blue:Float, Alpha:Float = 1):Int
+	{	
 		return cast FlxColor.fromRGBFloat(Red, Green, Blue, Alpha);
+	}
 
 	public static inline function fromCMYK(Cyan:Float, Magenta:Float, Yellow:Float, Black:Float, Alpha:Float = 1):Int
+	{
 		return cast FlxColor.fromCMYK(Cyan, Magenta, Yellow, Black, Alpha);
+	}
 
 	public static function fromHSB(Hue:Float, Sat:Float, Brt:Float, Alpha:Float = 1):Int
+	{	
 		return cast FlxColor.fromHSB(Hue, Sat, Brt, Alpha);
-
+	}
 	public static function fromHSL(Hue:Float, Sat:Float, Light:Float, Alpha:Float = 1):Int
+	{	
 		return cast FlxColor.fromHSL(Hue, Sat, Light, Alpha);
-
+	}
 	public static function fromString(str:String):Int
+	{
 		return cast FlxColor.fromString(str);
+	}
 }
 
 class CustomInterp extends crowplexus.hscript.Interp

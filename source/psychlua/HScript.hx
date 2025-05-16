@@ -181,15 +181,6 @@ class HScript extends Iris
 		#end
 
 		// Functions & Variables
-		set('getPrivateVar', function(name:String, value:Dynamic) {
-			@:privateAccess
-			return Reflect.getProperty(MusicBeatState.getState(), value);
-		}); // untested
-		set('setPrivateVar', function(name:String, value:Dynamic, property:Dynamic) {
-			@:privateAccess
-			return Reflect.setProperty(MusicBeatState.getState(), value, property);
-		});
-
 		set('setVar', function(name:String, value:Dynamic) {
 			MusicBeatState.getVariables().set(name, value);
 			return value;

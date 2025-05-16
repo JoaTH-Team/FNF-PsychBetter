@@ -23,7 +23,7 @@ class MusicBeatState extends FlxState
 	var _psychCameraInitialized:Bool = false;
 
 	function getStateScript(name:String, stateGame:Dynamic) {
-		return GlobalScriptHandler.setState('states/'+ name, stateGame);
+		return GlobalScriptHandler.setState(name, stateGame);
 	}
 
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();

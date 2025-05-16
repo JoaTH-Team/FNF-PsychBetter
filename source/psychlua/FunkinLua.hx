@@ -57,6 +57,8 @@ class FunkinLua {
 	public var callbacks:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public static var customFunctions:Map<String, Dynamic> = new Map<String, Dynamic>();
 
+	private var game:PlayState;
+
 	public function new(scriptName:String) {
 		lua = LuaL.newstate();
 		LuaL.openlibs(lua);
@@ -67,7 +69,7 @@ class FunkinLua {
 		//LuaL.dostring(lua, CLENSE);
 
 		this.scriptName = scriptName.trim();
-		var game:PlayState = PlayState.instance;
+		this.game = PlayState.instance;
 		game.luaArray.push(this);
 
 		var myFolder:Array<String> = this.scriptName.split('/');

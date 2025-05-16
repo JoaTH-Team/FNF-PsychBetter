@@ -66,6 +66,11 @@ class Main extends Sprite
 	{
 		super();
 
+		#if (cpp && windows)
+		backend.WindowsAPI.fixScaling();
+		backend.WindowsAPI.darkMode(true);
+		#end
+
 		// Credits to MAJigsaw77 (he's the og author for this code)
 		#if android
 		Sys.setCwd(Path.addTrailingSlash(Context.getExternalFilesDir()));

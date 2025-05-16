@@ -1,5 +1,6 @@
 package psychlua;
 
+import flixel.FlxState;
 import flixel.FlxBasic;
 import objects.Character;
 import psychlua.LuaUtils;
@@ -84,10 +85,14 @@ class HScript extends Iris
 	#end
 
 	public var origin:String;
-	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null, ?manualRun:Bool = false)
+	var parentState:FlxState = null;
+
+	override public function new(?parent:Dynamic, ?file:String, ?state:FlxState, ?varsToBring:Any = null, ?manualRun:Bool = false)
 	{
 		if (file == null)
 			file = '';
+
+		parentState = state ?? FlxG.state;
 
 		filePath = file;
 		if (filePath != null && filePath.length > 0)
@@ -115,7 +120,7 @@ class HScript extends Iris
 		#end
 		super(scriptThing, new IrisConfig(scriptName, false, false));
 		var customInterp:CustomInterp = new CustomInterp();
-		customInterp.parentInstance = FlxG.state;
+		customInterp.parentInstance = getParentState();
 		customInterp.showPosOnLog = false;
 		this.interp = customInterp;
 		#if LUA_ALLOWED
@@ -340,7 +345,16 @@ class HScript extends Iris
 		set('parentLua', null);
 		#end
 		set('this', this);
-		set('game', FlxG.state);
+
+		if (parentState != null) {
+			var cls = Type.getClass(parentState);
+			var clsName:String = Type.getClassName(cls);
+			var stateName:String = clsName.substr(clsName.indexOf('.') + 1);
+			
+			set('game', parentState);
+			set(stateName, cls);
+		}
+
 		set('controls', Controls.instance);
 
 		set('buildTarget', LuaUtils.getBuildTarget());
@@ -483,6 +497,10 @@ class HScript extends Iris
 			Iris.error('$e', pos);
 		}
 		return null;
+	}
+
+	function getParentState() {
+		return parentState;
 	}
 
 	override public function destroy()

@@ -1,5 +1,6 @@
 package backend;
 
+import psychlua.ScriptStateHandler;
 import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
@@ -23,13 +24,21 @@ class MusicBeatState extends FlxUIState
 
 	var _psychCameraInitialized:Bool = false;
 
+	function setScriptState(name:String, baseState:Dynamic) {
+		return ScriptStateHandler.setState(name, baseState);
+	}
+
 	override function create() {
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED Mods.updatedOnState = false; #end
 
 		if(!_psychCameraInitialized) initPsychCamera();
 
+		ScriptStateHandler.callOnScripts("onCreate", []);
+
 		super.create();
+
+		ScriptStateHandler.callOnScripts("onCreatePost", []);
 
 		if(!skip) {
 			openSubState(new CustomFadeTransition(0.6, true));
@@ -55,6 +64,8 @@ class MusicBeatState extends FlxUIState
 		var oldStep:Int = curStep;
 		timePassedOnState += elapsed;
 
+		ScriptStateHandler.callOnScripts("onUpdate", [elapsed]);
+
 		updateCurStep();
 		updateBeat();
 
@@ -79,6 +90,8 @@ class MusicBeatState extends FlxUIState
 		});
 
 		super.update(elapsed);
+
+		ScriptStateHandler.callOnScripts("onUpdatePost", [elapsed]);
 	}
 
 	private function updateSection():Void
@@ -173,6 +186,10 @@ class MusicBeatState extends FlxUIState
 			stage.stepHit();
 		});
 
+		ScriptStateHandler.callOnScripts("onStepHit", []);
+		ScriptStateHandler.setOnScripts("curStep", curStep);
+		ScriptStateHandler.setOnScripts("curDecStep", curDecStep);
+
 		if (curStep % 4 == 0)
 			beatHit();
 	}
@@ -186,6 +203,10 @@ class MusicBeatState extends FlxUIState
 			stage.curDecBeat = curDecBeat;
 			stage.beatHit();
 		});
+
+		ScriptStateHandler.callOnScripts("onBeatHit", []);
+		ScriptStateHandler.setOnScripts("curBeat", curBeat);
+		ScriptStateHandler.setOnScripts("curDecBeat", curDecBeat);
 	}
 
 	public function sectionHit():Void
@@ -195,6 +216,9 @@ class MusicBeatState extends FlxUIState
 			stage.curSection = curSection;
 			stage.sectionHit();
 		});
+
+		ScriptStateHandler.callOnScripts("onSectionHit", []);
+		ScriptStateHandler.setOnScripts("curSection", curSection);
 	}
 
 	function stagesFunc(func:BaseStage->Void)

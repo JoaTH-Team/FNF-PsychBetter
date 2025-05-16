@@ -36,6 +36,11 @@ class TitleState extends MusicBeatState
 	var skippedIntro:Bool = false;
 	var titleJSON:TitleData;
 
+	public function new() {
+		super();
+		setScriptState(Type.getClassName(Type.getClass(this)).split('.').pop(), this);
+	}
+
 	override public function create()
 	{
 		super.create();

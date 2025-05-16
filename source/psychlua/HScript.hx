@@ -154,6 +154,8 @@ class HScript extends Iris
 		set('FlxMath', flixel.math.FlxMath);
 		set('FlxSprite', flixel.FlxSprite);
 		set('FlxCamera', flixel.FlxCamera);
+		set('FlxText', flixel.text.FlxText);
+		set('FlxTypeText', flixel.addons.text.FlxTypeText);
 		set('PsychCamera', backend.PsychCamera);
 		set('FlxTimer', flixel.util.FlxTimer);
 		set('FlxTween', flixel.tweens.FlxTween);
@@ -179,6 +181,9 @@ class HScript extends Iris
 		#if flxanimate
 		set('FlxAnimate', FlxAnimate);
 		#end
+
+		set('BGSprite', objects.BGSprite);
+		set('SpectralAnalyzer', funkin.vis.dsp.SpectralAnalyzer);
 
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic) {

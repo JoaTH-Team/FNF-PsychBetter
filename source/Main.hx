@@ -23,6 +23,8 @@ import states.TitleState;
 import lime.graphics.Image;
 #end
 
+import backend.ALSoftConfig;
+
 //crash handler stuff
 #if CRASH_HANDLER
 import openfl.events.UncaughtErrorEvent;

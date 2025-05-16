@@ -128,6 +128,11 @@ class Main extends Sprite
 		}
 		#end
 
+		var funkinSoundTray = new backend.FunkinSoundTray();
+		addChild(funkinSoundTray);
+		Lib.current.stage.align = "tl";
+		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+
 		#if linux
 		var icon = Image.fromFile("icon.png");
 		Lib.current.stage.window.setIcon(icon);

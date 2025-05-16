@@ -3,10 +3,7 @@ package states;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.frames.FlxFrame;
 import flixel.group.FlxGroup;
-import flixel.input.gamepad.FlxGamepad;
-import haxe.Json;
 
-import openfl.Assets;
 import shaders.ColorSwap;
 
 typedef TitleData =

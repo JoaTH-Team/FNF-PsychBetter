@@ -24,9 +24,9 @@ class ScriptStateHandler {
     public static var luaArray:Array<FunkinLua> = [];
     #end
 
-    public static function setState(nameFile:String, stateInstance:FlxState) {
+    public static function setState(nameFile:String) {
         #if HSCRIPT_ALLOWED
-        startHScriptNamed('states/$nameFile.hx', stateInstance);
+        startHScriptNamed('states/$nameFile.hx');
         #end
         
         #if LUA_ALLOWED
@@ -36,7 +36,7 @@ class ScriptStateHandler {
 
     // HScript Functions
     #if HSCRIPT_ALLOWED
-    public static function startHScriptNamed(scriptFile:String, states:FlxState):Bool
+    public static function startHScriptNamed(scriptFile:String):Bool
     {
         #if MODS_ALLOWED
         var scriptToLoad:String = Paths.modFolders(scriptFile);
@@ -48,13 +48,13 @@ class ScriptStateHandler {
 
         if(FileSystem.exists(scriptToLoad))
         {
-            initHScript(scriptToLoad, states);
+            initHScript(scriptToLoad);
             return true;
         }
         return false;
     }
 
-    public static function initHScript(file:String, states:FlxState):Void
+    public static function initHScript(file:String):Void
     {
         try
         {
@@ -63,7 +63,7 @@ class ScriptStateHandler {
                 hscript = null;
             }
             
-            hscript = new HScript(null, file, states);
+            hscript = new HScript(null, file);
             if (hscript.exists('onCreate')) hscript.call('onCreate');
             trace('initialized hscript successfully: $file');
         }
@@ -97,22 +97,6 @@ class ScriptStateHandler {
             return true;
         }
         return false;
-    }
-
-    public static function addLuaScript(scriptPath:String):FunkinLua
-    {
-        var script:FunkinLua = new FunkinLua(scriptPath);
-        luaArray.push(script);
-        return script;
-    }
-
-    public static function removeLuaScript(script:FunkinLua):Void
-    {
-        if(script != null)
-        {
-            script.stop();
-            luaArray.remove(script);
-        }
     }
     #end
 

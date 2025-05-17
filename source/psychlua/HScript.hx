@@ -87,12 +87,12 @@ class HScript extends Iris
 	public var origin:String;
 	var parentState:FlxState = null;
 
-	override public function new(?parent:Dynamic, ?file:String, ?state:FlxState, ?varsToBring:Any = null, ?manualRun:Bool = false)
+	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null, ?manualRun:Bool = false)
 	{
 		if (file == null)
 			file = '';
 
-		parentState = state ?? FlxG.state;
+		trace(file);
 
 		filePath = file;
 		if (filePath != null && filePath.length > 0)
@@ -100,10 +100,11 @@ class HScript extends Iris
 			this.origin = filePath;
 			#if MODS_ALLOWED
 			var myFolder:Array<String> = filePath.split('/');
-			if(myFolder[0] + '/' == Paths.mods() && (Mods.currentModDirectory == myFolder[1] || Mods.getGlobalMods().contains(myFolder[1]))) //is inside mods folder
+			if(myFolder[0] + '/' == Paths.mods() && (Mods.currentModDirectory == myFolder[1] || Mods.getGlobalMods().contains(myFolder[1])))
 				this.modFolder = myFolder[1];
 			#end
 		}
+
 		var scriptThing:String = file;
 		var scriptName:String = null;
 		if(parent == null && file != null)
@@ -118,11 +119,13 @@ class HScript extends Iris
 		if (scriptName == null && parent != null)
 			scriptName = parent.scriptName;
 		#end
+
 		super(scriptThing, new IrisConfig(scriptName, false, false));
 		var customInterp:CustomInterp = new CustomInterp();
-		customInterp.parentInstance = getParentState();
+		customInterp.parentInstance = FlxG.state;
 		customInterp.showPosOnLog = false;
 		this.interp = customInterp;
+		
 		#if LUA_ALLOWED
 		parentLua = parent;
 		if (parent != null)
@@ -131,8 +134,10 @@ class HScript extends Iris
 			this.modFolder = parent.modFolder;
 		}
 		#end
+
 		preset();
 		this.varsToBring = varsToBring;
+		
 		if (!manualRun) {
 			try {
 				var ret:Dynamic = execute();
@@ -346,14 +351,7 @@ class HScript extends Iris
 		#end
 		set('this', this);
 
-		if (parentState != null) {
-			var cls = Type.getClass(parentState);
-			var clsName:String = Type.getClassName(cls);
-			var stateName:String = clsName.substr(clsName.indexOf('.') + 1);
-			
-			set('game', parentState);
-			set(stateName, cls);
-		}
+		set('game', FlxG.state);
 
 		set('controls', Controls.instance);
 
@@ -499,8 +497,8 @@ class HScript extends Iris
 		return null;
 	}
 
-	function getParentState() {
-		return parentState;
+	function getParentState():FlxState {
+		return MusicBeatState.getState();
 	}
 
 	override public function destroy()

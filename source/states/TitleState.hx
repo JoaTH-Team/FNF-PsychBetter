@@ -38,7 +38,8 @@ class TitleState extends MusicBeatState
 
 	public function new() {
 		super();
-		setScriptState(Type.getClassName(Type.getClass(this)).split('.').pop(), this);
+		setScriptState(Type.getClassName(Type.getClass(this)).split('.').pop());
+		setVarToScript([logoBl, gfDance, danceLeft, titleText]);
 	}
 
 	override public function create()

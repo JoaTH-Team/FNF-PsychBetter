@@ -24,8 +24,14 @@ class MusicBeatState extends FlxUIState
 
 	var _psychCameraInitialized:Bool = false;
 
-	function setScriptState(name:String, baseState:Dynamic) {
-		return ScriptStateHandler.setState(name, baseState);
+	function setScriptState(name:String) {
+		ScriptStateHandler.setState(name);
+	}
+
+	function setVarToScript(name:Array<Dynamic>) {
+		for (i in name) {
+			ScriptStateHandler.setOnScripts(name[i], name[i]);
+		}
 	}
 
 	override function create() {

@@ -1,48 +1,22 @@
-# Petite Psych
+# Psych Better - A Modify of Psych Engine (0.7.3)
 
-A fork of [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine) that aims to strip the entirety of base game away from the main engine to make it less much a hassle to mod
+Psych Engine is a rewritten engine
 
----
+We rewritten the engine with code of Psych Engine, wow
 
-## Changelog:
+## Thing done so far
+- [ ] Custom State/Sub State
+- [ ] Added `importScript`
+- [ ] ReAdded `TitleState`, `MainMenuState`, `StoryMenuState`, `FreeplayState`,...
 
-- Added Funkin' (0.3+) intro texts
-- Removed Psych Engine devs easter egg
-- Added "Nigth" easter egg to Title Screen (from Base Game)
-- Haxe Library versions are now fixed, please use the setup files inside the setup folder.
-- Removed Week-specific Events such as Dadbattle Spotlight, Philly Glow, Kill Henchmen, etc…
-- Remove most base game files (aside from the ones that are dependencies)
-- Removed Automatic Updater
+## Build this engine (STILL IN PROGRESS)
+1. Install `hmm` for install needed haxelib library for this engine
+    - Please go to this page for [install `hmm`](https://lib.haxe.org/p/hmm/)
+    - After that, open the terminal on the root project and type `hmm install`
+    - Wait for the `hmm` done install all haxelib library needed
+2. Compile the game
+    - If you using **Linux**, you can just type `haxelib run lime build linux`
+        - If cannot compile the game due to missing `g++`, install `g++` by using `sudo apt-get install g++` (Ubuntu/Debian)
+    - If you using **Windows**, you will need [Visual Studio](https://visualstudio.microsoft.com/), you can also install the [Visual Studio](https://visualstudio.microsoft.com/) by using `msvc-win.bat` on the `setup` folder
 
-## Installation:
-
-Refer to [the Build Instructions](./BUILDING.md)
-
-## Customization:
-
-if you wish to disable things like *Lua Scripts* or *Video Cutscenes*, you can read over to `Project.xml`
-
-inside `Project.xml`, you will find several variables to customize Psych Engine to your liking
-
-to start you off, disabling Videos should be simple, simply Delete the line `"VIDEOS_ALLOWED"` or comment it out by wrapping the line in XML-like comments, like this `<!-- YOUR_LINE_HERE -->`
-
-same goes for *Lua Scripts*, comment out or delete the line with `LUA_ALLOWED`, this and other customization options are all available within the `Project.xml` file
-
-## Psych Engine Credits
-* Shadow Mario - Programmer
-* Riveren - Artist
-
----
-
-* bbpanzu - Ex-Programmer
-* Yoshubs - Ex-Programmer, we do **NOT** condone her doings.
-* SqirraRNG - Crash Handler and Base code for Chart Editor's Waveform
-* KadeDev - Fixed some cool stuff on Chart Editor and other PRs
-* iFlicky - Composer of Psync and Tea Time, also made the Dialogue Sounds
-* PolybiusProxy - .MP4 Video Loader Library (hxCodec)
-* Keoiki - Note Splash Animations
-* Smokey - Sprite Atlas Support
-* Nebula the Zorua - some Lua reworks
-* superpowers04 - LUA JIT Fork
-
----
+And That all for this Engine, eyyyy

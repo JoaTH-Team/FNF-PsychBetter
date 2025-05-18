@@ -1,6 +1,13 @@
 {
   "dependencies": [
     {
+      "name": "SScript",
+      "type": "git",
+      "dir": null,
+      "ref": "testing",
+      "url": "https://github.com/Altronix-Team/SScript.git"
+    },
+    {
       "name": "flixel",
       "type": "haxelib",
       "version": "5.6.1"
@@ -40,11 +47,6 @@
       "dir": null,
       "ref": "main",
       "url": "https://gitlab.com/haxe-grig/grig.audio.git"
-    },
-    {
-      "name": "hscript-iris",
-      "type": "haxelib",
-      "version": "1.1.3"
     },
     {
       "name": "hxdiscord_rpc",

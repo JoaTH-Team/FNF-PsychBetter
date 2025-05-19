@@ -3,11 +3,12 @@ package psychlua;
 import flixel.util.FlxColor;
 import openfl.Lib;
 import openfl.display.Sprite;
+import openfl.display.StageScaleMode;
 import openfl.events.Event;
 
 class ScriptTraceHandler extends Sprite
 {
-    private var MAX_TRACES:Int = 20;
+	private var MAX_TRACES:Int = 39; // good for overlaps the screen
     private var DISPLAY_TIME:Float = 5000;
     private var FADE_TIME:Float = 2000;
     
@@ -18,6 +19,8 @@ class ScriptTraceHandler extends Sprite
         super();
         traces = [];
         addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		Lib.current.stage.align = "tl";
+		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
     }
     
     private function onEnterFrame(e:Event):Void {

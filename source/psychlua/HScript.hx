@@ -14,12 +14,15 @@ class HScript extends SScript
 	public var modFolder:String;
 	public var origin:String;
 
+	public static var nameScript:String;
+
 	override public function new(?parent:Dynamic, ?file:String, ?varsToBring:Any = null)
 	{
 		if (file == null)
 			file = '';
 
 		this.varsToBring = varsToBring;
+		nameScript = file;
 	
 		super(file, false, false);
 
@@ -61,9 +64,10 @@ class HScript extends SScript
 		#end
 
 		// Functions & Variables
-		set('debugPrint', function(text:String, ?color:FlxColor = null) {
+		set('debugPrint', function(text:String, ?color:FlxColor = null, ?line:Int = -1)
+		{
 			if(color == null) color = FlxColor.WHITE;
-			addTextToDebug(text, color);
+			addTextToDebug(text, true, color);
 		});
 
 		// Keyboard & Gamepads

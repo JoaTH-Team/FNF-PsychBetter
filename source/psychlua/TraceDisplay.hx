@@ -15,7 +15,7 @@ class TraceDisplay extends TextField
     public function new() {
         super();
 
-        format = new TextFormat(Paths.font("phantommuff.ttf"), 14, FlxColor.WHITE);
+		format = new TextFormat(Paths.font("phantommuff.ttf"), 18, FlxColor.WHITE);
 
         defaultTextFormat = format;
         format.letterSpacing = -.5;

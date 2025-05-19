@@ -9,7 +9,7 @@ class ScriptStateHandler {
     public static var instancesExclude:Array<String> = [];
 
     public static function setStateForScript(name:String, ?statesInstance:Dynamic, ?setAnyVar:Array<Dynamic>) {
-        initHScript('states/$name.hx');
+		startHScriptsNamed('states/$name.hx');
         setOnScripts('game', statesInstance);
         if (setAnyVar != null) {
             for (varObj in setAnyVar) {
@@ -70,7 +70,7 @@ class ScriptStateHandler {
 				}
 				else trace('initialized tea interp successfully: $file');
 			}
-
+			trace('added tea interp: $file');
 		}
 		catch(e)
 		{

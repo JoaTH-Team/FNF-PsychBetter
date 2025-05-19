@@ -6,8 +6,9 @@ import flixel.FlxObject;
 import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxSpriteGroup;
-import flixel.system.FlxSound;
+import flixel.sound.FlxSound;
 import flixel.tweens.FlxTween;
+import objects.StrumNote;
 import psychlua.ScriptStateHandler;
 
 class PlayState extends FlxState

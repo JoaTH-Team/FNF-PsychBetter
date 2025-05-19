@@ -8,9 +8,9 @@ class PlayState extends FlxState
 	public function new() {
 		super();
 
-		ScriptStateHandler.setStateForScript('PlayState', this, [
-			{name: "camera", value: camera},
-		]);
+		ScriptStateHandler.setStateForScript('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this, {
+			camera: this.camera
+		});
 	}
 	
 	override public function create()

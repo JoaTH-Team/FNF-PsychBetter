@@ -125,10 +125,39 @@ class HScript extends SScript
 		set('remove', FlxG.state.remove);
 
 		if(varsToBring != null) {
-			for (key in Reflect.fields(varsToBring)) {
-				key = key.trim();
-				var value = Reflect.field(varsToBring, key);
-				set(key, Reflect.field(varsToBring, key));
+			// Support Map<String, Dynamic>
+			var isMap = false;
+			try
+			{
+				isMap = Type.getClassName(Type.getClass(varsToBring)) == "haxe.ds.StringMap";
+			}
+			catch (e:Dynamic) {}
+			if (isMap)
+			{
+				var map:Map<String, Dynamic> = cast varsToBring;
+				for (key in map.keys())
+				{
+					set(key, map.get(key));
+				}
+			}
+			// Support Array<{name:String, value:Dynamic}>
+			else if (Std.isOfType(varsToBring, Array))
+			{
+				var arr:Array<Dynamic> = cast varsToBring;
+				for (item in arr)
+				{
+					if (Reflect.hasField(item, 'name') && Reflect.hasField(item, 'value'))
+						set(Reflect.field(item, 'name'), Reflect.field(item, 'value'));
+				}
+			}
+			// Support anonymous object with fields
+			else
+			{
+				for (key in Reflect.fields(varsToBring))
+				{
+					var value = Reflect.field(varsToBring, key);
+					set(key, value);
+				}
 			}
 			varsToBring = null;
 		}

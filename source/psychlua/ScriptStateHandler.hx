@@ -8,39 +8,37 @@ class ScriptStateHandler {
     public static var hscriptArray:Array<HScript> = [];
     public static var instancesExclude:Array<String> = [];
 
-    public static function setStateForScript(name:String, ?statesInstance:Dynamic, ?setAnyVar:Array<Dynamic>) {
-		startHScriptsNamed('states/$name.hx');
-        setOnScripts('game', statesInstance);
-        if (setAnyVar != null) {
-            for (varObj in setAnyVar) {
-                setOnScripts(varObj.name, varObj.value);
-            }
-        }
-    }
-
-	public static function startHScriptsNamed(scriptFile:String)
+	public static function setStateForScript(name:String, ?statesInstance:Dynamic, ?setAnyVar:Any = null)
 	{
-        #if sys
-        var scriptToLoad:String = Paths.getSharedPath(scriptFile);
-        #else
+		startHScriptsNamed('states/$name.hx', setAnyVar);
+		setOnScripts('game', statesInstance);
+	}
+
+	public static function startHScriptsNamed(scriptFile:String, ?setAnyVar:Any = null)
+	{
 		var scriptToLoad:String = Paths.modFolders(scriptFile);
-		if(!FileSystem.exists(scriptToLoad))
-			scriptToLoad = Paths.getSharedPath(scriptFile);
-        #end
+		if (!FileSystem.exists(scriptToLoad))
+		{
+			scriptToLoad = 'assets/states/' + scriptFile.split('/').pop();
+		}
 
 		if(FileSystem.exists(scriptToLoad))
 		{
-			initHScript(scriptToLoad);
+			initHScript(scriptToLoad, setAnyVar);
 			return true;
+		}
+		else
+		{
+			addTextToDebug('Script file not found: ' + scriptToLoad, FlxColor.RED);
 		}
 		return false;
 	}
 
-	public static function initHScript(file:String)
+	public static function initHScript(file:String, ?setAnyVar:Any = null)
 	{
 		try
 		{
-			var newScript:HScript = new HScript(null, file);
+			var newScript:HScript = new HScript(null, file, setAnyVar);
 			if(newScript.parsingException != null)
 			{
 				addTextToDebug('ERROR ON LOADING: ${newScript.parsingException.message}', FlxColor.RED);
@@ -54,7 +52,7 @@ class ScriptStateHandler {
 				var callValue = newScript.call('onCreate');
 				if(!callValue.succeeded)
 				{
-					for (e in callValue.exceptions)
+					for (e in (callValue.exceptions : Array<Dynamic>))
 					{
 						if (e != null)
 						{

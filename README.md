@@ -14,7 +14,10 @@ We rewritten the engine with code of Psych Engine, wow
     - Please go to this page for [install `hmm`](https://lib.haxe.org/p/hmm/)
     - After that, open the terminal on the root project and type `hmm install`
     - Wait for the `hmm` done install all haxelib library needed
-2. Compile the game
+2. Install `SScript` for this engine
+    - Since `SScript` has been cancel, you will have to [install this web](https://github.com/CCobaltDev/SScript-Archive)
+    - Select the `7.7.0` version for this
+3. Compile the game
     - If you using **Linux**, you can just type `haxelib run lime build linux`
         - If cannot compile the game due to missing `g++`, install `g++` by using `sudo apt-get install g++` (Ubuntu/Debian)
     - If you using **Windows**, you will need [Visual Studio](https://visualstudio.microsoft.com/), you can also install the [Visual Studio](https://visualstudio.microsoft.com/) by using `msvc-win.bat` on the `setup` folder

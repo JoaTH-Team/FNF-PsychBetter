@@ -1,13 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "SScript",
-      "type": "git",
-      "dir": null,
-      "ref": "testing",
-      "url": "https://github.com/Altronix-Team/SScript.git"
-    },
-    {
       "name": "flixel",
       "type": "haxelib",
       "version": "5.6.1"

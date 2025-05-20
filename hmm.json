@@ -1,16 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "lime",
-      "type": "haxelib",
-      "version": "8.2.2"
-    },
-    {
-      "name": "openfl",
-      "type": "haxelib",
-      "version": "9.3.3"
-    },
-    {
       "name": "flixel",
       "type": "haxelib",
       "version": "5.6.1"
@@ -31,19 +21,30 @@
       "version": "2.6.3"
     },
     {
-      "name": "hxvlc",
-      "type": "haxelib",
-      "version": "2.0.1"
+      "name": "flxanimate",
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/ShadowMario/flxanimate"
+    },
+    {
+      "name": "funkin.vis",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/FunkinCrew/funkVis"
+    },
+    {
+      "name": "grig.audio",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/osakared/grig.audio"
     },
     {
       "name": "hxdiscord_rpc",
       "type": "haxelib",
       "version": "1.2.4"
-    },
-    {
-      "name": "tjson",
-      "type": "haxelib",
-      "version": "1.4.0"
     },
     {
       "name": "hxdiscord_rpc",
@@ -53,11 +54,14 @@
       "url": "https://github.com/MAJigsaw77/hxdiscord_rpc"
     },
     {
-      "name": "flxanimate",
-      "type": "git",
-      "dir": null,
-      "ref": "dev",
-      "url": "https://github.com/ShadowMario/flxanimate"
+      "name": "hxvlc",
+      "type": "haxelib",
+      "version": "2.0.1"
+    },
+    {
+      "name": "lime",
+      "type": "haxelib",
+      "version": "8.2.2"
     },
     {
       "name": "linc_luajit",
@@ -65,6 +69,16 @@
       "dir": null,
       "ref": "1906c4a96f6bb6df66562b3f24c62f4c5bba14a7",
       "url": "https://github.com/superpowers04/linc_luajit"
+    },
+    {
+      "name": "openfl",
+      "type": "haxelib",
+      "version": "9.3.3"
+    },
+    {
+      "name": "tjson",
+      "type": "haxelib",
+      "version": "1.4.0"
     }
   ]
 }

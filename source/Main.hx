@@ -6,18 +6,18 @@ import android.content.Context;
 
 import backend.*;
 
-import flixel.graphics.FlxGraphic;
 import flixel.input.keyboard.FlxKey;
 import flixel.FlxGame;
-import flixel.FlxState;
-import haxe.io.Path;
-import openfl.Assets;
 import openfl.Lib;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
 import lime.app.Application;
 import states.TitleState;
+
+#if desktop
+import backend.ALSoftConfig; // Just to make sure DCE doesn't remove this, since it's not directly referenced anywhere else.
+#end
 
 #if linux
 import lime.graphics.Image;

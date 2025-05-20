@@ -1,11 +1,9 @@
 package backend;
 
-import backend.PsychCamera;
-import flixel.FlxG;
-import flixel.FlxState;
-import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.ui.FlxUIState;
-import states.PlayState;
+import flixel.addons.transition.FlxTransitionableState;
+import flixel.FlxState;
+import backend.PsychCamera;
 
 class MusicBeatState extends FlxUIState
 {

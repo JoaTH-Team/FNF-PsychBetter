@@ -1,21 +1,26 @@
 package backend;
 
-import flash.media.Sound;
-import flixel.FlxG;
-import flixel.graphics.FlxGraphic;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFrame.FlxFrameAngle;
-import flxanimate.FlxAnimate;
-import lime.utils.Assets;
+import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.graphics.FlxGraphic;
+import flixel.math.FlxRect;
+
 import openfl.display.BitmapData;
 import openfl.display3D.textures.RectangleTexture;
-import openfl.system.System;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
-import sys.FileSystem;
-import sys.io.File;
+import openfl.system.System;
+import openfl.geom.Rectangle;
 
-using StringTools;
+import lime.utils.Assets;
+import flash.media.Sound;
+
+import haxe.Json;
+
+
+#if MODS_ALLOWED
+import backend.Mods;
+#end
 
 class Paths
 {
@@ -134,7 +139,7 @@ class Paths
 
 	inline public static function getSharedPath(file:String = '')
 	{
-		return 'assets/' + file;
+		return 'assets/shared/$file';
 	}
 
 	inline static public function txt(key:String, ?library:String)
@@ -207,11 +212,6 @@ class Paths
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		var inst = returnSound(null, songKey, 'songs');
 		return inst;
-	}
-
-	inline static public function gif(file:String) {
-		var gifPath:String = 'gif/$file.gif';
-		return getPath(gifPath);
 	}
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
@@ -429,7 +429,7 @@ class Paths
 	}
 
 	public static var currentTrackedSounds:Map<String, Sound> = [];
-	public static function returnSound(path:Null<String>, ?key:String, ?library:String) {
+	public static function returnSound(path:Null<String>, key:String, ?library:String) {
 		#if MODS_ALLOWED
 		var modLibPath:String = '';
 		if (library != null) modLibPath = '$library/';
@@ -467,6 +467,7 @@ class Paths
 		return currentTrackedSounds.get(gottenPath);
 	}
 
+	#if MODS_ALLOWED
 	inline static public function mods(key:String = '') {
 		return 'mods/' + key;
 	}
@@ -503,6 +504,20 @@ class Paths
 		return modFolders('images/' + key + '.json');
 	}
 
+	/* Goes unused for now
+
+	inline static public function modsShaderFragment(key:String, ?library:String)
+	{
+		return modFolders('shaders/'+key+'.frag');
+	}
+	inline static public function modsShaderVertex(key:String, ?library:String)
+	{
+		return modFolders('shaders/'+key+'.vert');
+	}
+	inline static public function modsAchievements(key:String) {
+		return modFolders('achievements/' + key + '.json');
+	}*/
+
 	static public function modFolders(key:String) {
 		if(Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0) {
 			var fileToCheck:String = mods(Mods.currentModDirectory + '/' + key);
@@ -518,6 +533,7 @@ class Paths
 		}
 		return 'mods/' + key;
 	}
+	#end
 
 	#if flxanimate
 	public static function loadAnimateAtlas(spr:FlxAnimate, folderOrImg:Dynamic, spriteJson:Dynamic = null, animationJson:Dynamic = null)
@@ -588,5 +604,17 @@ class Paths
 		//trace(animationJson);
 		spr.loadAtlasEx(folderOrImg, spriteJson, animationJson);
 	}
+
+	/*private static function getContentFromFile(path:String):String
+	{
+		var onAssets:Bool = false;
+		var path:String = Paths.getPath(path, TEXT, true);
+		if(FileSystem.exists(path) || (onAssets = true && Assets.exists(path, TEXT)))
+		{
+			//trace('Found text: $path');
+			return !onAssets ? File.getContent(path) : Assets.getText(path);
+		}
+		return null;
+	}*/
 	#end
 }

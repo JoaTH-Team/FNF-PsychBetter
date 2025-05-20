@@ -1,11 +1,10 @@
 package backend;
 
-import flixel.FlxG;
-import flixel.input.gamepad.FlxGamepadInputID;
-import flixel.input.keyboard.FlxKey;
-import flixel.math.FlxMath;
-import flixel.util.FlxColor;
 import flixel.util.FlxSave;
+import flixel.input.keyboard.FlxKey;
+import flixel.input.gamepad.FlxGamepadInputID;
+
+import states.TitleState;
 
 // Add a variable here and it will get automatically saved
 @:structInit class SaveVariables {
@@ -76,7 +75,6 @@ import flixel.util.FlxSave;
 	public var safeFrames:Float = 10;
 	public var guitarHeroSustains:Bool = true;
 	public var discordRPC:Bool = true;
-	public var windowDarkMode:Bool = true;
 }
 
 class ClientPrefs {

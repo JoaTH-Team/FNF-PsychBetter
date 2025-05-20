@@ -1,12 +1,9 @@
 package backend;
 
-import backend.Section;
 import haxe.Json;
 import lime.utils.Assets;
-import sys.FileSystem;
-import sys.io.File;
 
-using StringTools;
+import backend.Section;
 
 typedef SwagSong =
 {

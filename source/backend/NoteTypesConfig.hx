@@ -2,8 +2,6 @@ package backend;
 
 import objects.Note;
 
-using StringTools;
-
 typedef NoteTypeProperty = {
 	property:Array<String>,
 	value:Dynamic

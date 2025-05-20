@@ -1,10 +1,8 @@
 package backend;
 
-import backend.Song;
-import haxe.Json;
 import openfl.utils.Assets;
-
-using StringTools;
+import haxe.Json;
+import backend.Song;
 
 typedef StageFile = {
 	var directory:String;

@@ -1,9 +1,5 @@
 package backend;
 
-import flixel.FlxCamera;
-import flixel.FlxSprite;
-import flixel.math.FlxPoint;
-
 // PsychCamera handles followLerp based on elapsed
 // and stops camera from snapping at higher framerates
 

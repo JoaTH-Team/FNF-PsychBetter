@@ -1,7 +1,6 @@
 package backend;
 
 import backend.ClientPrefs;
-import flixel.FlxG;
 
 class Rating
 {

@@ -1,12 +1,7 @@
 package backend;
 
-import flixel.FlxG;
-import flixel.text.FlxText;
-import flixel.util.FlxColor;
-import lime.utils.Assets as LimeAssets;
 import openfl.utils.Assets;
-
-using StringTools;
+import lime.utils.Assets as LimeAssets;
 
 class CoolUtil
 {
@@ -162,14 +157,4 @@ class CoolUtil
 				text.borderStyle = NONE;
 		}
 	}
-
-	public static function coolLerp(base:Float, target:Float, ratio:Float):Float
-	{
-		return base + cameraLerp(ratio) * (target - base);
-	}	
-	
-	public static function cameraLerp(lerp:Float):Float
-  	{
-  	  	return lerp * (FlxG.elapsed / (1 / 60));
-  	}
 }

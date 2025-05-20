@@ -1,9 +1,6 @@
 package backend;
 
 import haxe.Json;
-import sys.FileSystem;
-
-using StringTools;
 
 typedef ModsList = {
 	enabled:Array<String>,

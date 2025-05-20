@@ -1,5 +1,6 @@
 package backend;
 
+import debug.DebugOverlay;
 import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
@@ -22,6 +23,8 @@ class MusicBeatState extends FlxUIState
 	}
 
 	var _psychCameraInitialized:Bool = false;
+
+	private var debugOverlay:DebugOverlay;
 
 	override function create() {
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
@@ -57,7 +60,6 @@ class MusicBeatState extends FlxUIState
 
 		updateCurStep();
 		updateBeat();
-
 		if (oldStep != curStep)
 		{
 			if(curStep > 0)

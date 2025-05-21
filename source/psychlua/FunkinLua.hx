@@ -364,11 +364,11 @@ class FunkinLua {
 		});
 
 		Lua_helper.add_callback(lua, "setVar", function(varName:String, value:Dynamic) {
-			PlayState.instance.variables.set(varName, value);
+			MusicBeatState.getState().variables.set(varName, value);
 			return value;
 		});
 		Lua_helper.add_callback(lua, "getVar", function(varName:String) {
-			return PlayState.instance.variables.get(varName);
+			return MusicBeatState.getState().variables.get(varName);
 		});
 
 		Lua_helper.add_callback(lua, "addLuaScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false) { //would be dope asf.

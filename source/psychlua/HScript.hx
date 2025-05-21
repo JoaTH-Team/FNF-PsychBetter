@@ -105,6 +105,7 @@ class HScript extends SScript
 		set('Alphabet', Alphabet);
 		set('Note', objects.Note);
 		set('CustomSubstate', CustomSubstate);
+		set('CustomState', CustomState);
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end
@@ -119,20 +120,59 @@ class HScript extends SScript
 		set('BGSprite', objects.BGSprite);
 
 		// Functions & Variables
+		// Soft-code switch state/open or closed custom state
+		set('openCustomSubstate', function(name:String, ?pauseGame:Bool = false) {
+			var currentState = FlxG.state;
+			if (currentState == null) return false;
+			
+			if (pauseGame && Std.isOfType(currentState, MusicBeatState)) {
+				var musicBeatState:MusicBeatState = cast currentState;
+				FlxG.camera.followLerp = 0;
+				musicBeatState.persistentUpdate = false;
+				musicBeatState.persistentDraw = true;
+				
+				if (FlxG.sound.music != null) {
+					FlxG.sound.music.pause();
+					if (Std.isOfType(currentState, PlayState)) {
+						var playState:PlayState = cast currentState;
+						if (playState.vocals != null) playState.vocals.pause();
+					}
+				}
+			}
+			
+			currentState.openSubState(new CustomSubstate(name, currentState));
+			return true;
+		});
+		set('closeCustomSubState', function() {
+			if (CustomSubstate.instance != null) {
+				CustomSubstate.instance.parentState.closeSubState();
+				return true;
+			}
+			return false;
+		});
+
+		set('switchCustomState', function (name:String, ?switchWithLoad:Bool = false) {
+			if (switchWithLoad) {
+				LoadingState.loadAndSwitchState(new CustomState(name));
+			} else {
+				MusicBeatState.switchState(new CustomState(name));
+			}
+		});
+
 		set('setVar', function(name:String, value:Dynamic) {
-			PlayState.instance.variables.set(name, value);
+			MusicBeatState.getState().variables.set(name, value);
 			return value;
 		});
 		set('getVar', function(name:String) {
 			var result:Dynamic = null;
-			if(PlayState.instance.variables.exists(name)) result = PlayState.instance.variables.get(name);
+			if(MusicBeatState.getState().variables.exists(name)) result = MusicBeatState.getState().variables.get(name);
 			return result;
 		});
 		set('removeVar', function(name:String)
 		{
-			if(PlayState.instance.variables.exists(name))
+			if(MusicBeatState.getState().variables.exists(name))
 			{
-				PlayState.instance.variables.remove(name);
+				MusicBeatState.getState().variables.remove(name);
 				return true;
 			}
 			return false;

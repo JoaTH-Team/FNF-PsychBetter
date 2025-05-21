@@ -176,6 +176,7 @@ class MusicBeatState extends FlxUIState
 			CustomFadeTransition.finishCallback = function() FlxG.switchState(nextState);
 	}
 
+	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public static function getState():MusicBeatState {
 		return cast (FlxG.state, MusicBeatState);
 	}

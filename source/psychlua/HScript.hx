@@ -40,7 +40,7 @@ class HScript extends SScript
 			@:privateAccess
 			if(hs.parsingException != null)
 			{
-				PlayState.instance.addTextToDebug('ERROR ON LOADING (${hs.origin}): ${hs.parsingException.message}', FlxColor.RED);
+				addTextToDebug('ERROR ON LOADING (${hs.origin}): ${hs.parsingException.message}', FlxColor.RED);
 			}
 		}
 	}
@@ -139,14 +139,14 @@ class HScript extends SScript
 		});
 		set('debugPrint', function(text:String, ?color:FlxColor = null) {
 			if(color == null) color = FlxColor.WHITE;
-			PlayState.instance.addTextToDebug(text, color);
+			addTextToDebug(text, color);
 		});
 		set('getModSetting', function(saveTag:String, ?modName:String = null) {
 			if(modName == null)
 			{
 				if(this.modFolder == null)
 				{
-					PlayState.instance.addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
+					addTextToDebug('getModSetting: Argument #2 is null and script is not inside a packed Mod folder!', FlxColor.RED);
 					return null;
 				}
 				modName = this.modFolder;
@@ -273,7 +273,7 @@ class HScript extends SScript
 					return;
 				}
 				#end
-				if(PlayState.instance != null) PlayState.instance.addTextToDebug('$origin - $msg', FlxColor.RED);
+				if(PlayState.instance != null) addTextToDebug('$origin - $msg', FlxColor.RED);
 				else trace('$origin - $msg');
 			}
 		});
@@ -325,7 +325,7 @@ class HScript extends SScript
 			#if LUA_ALLOWED
 			FunkinLua.luaTrace(origin + ' - No HScript function named: $funcToRun', false, false, FlxColor.RED);
 			#else
-			PlayState.instance.addTextToDebug(origin + ' - No HScript function named: $funcToRun', FlxColor.RED);
+			addTextToDebug(origin + ' - No HScript function named: $funcToRun', FlxColor.RED);
 			#end
 			return null;
 		}
@@ -343,7 +343,7 @@ class HScript extends SScript
 					return null;
 				}
 				#end
-				PlayState.instance.addTextToDebug('$origin - $msg', FlxColor.RED);
+				addTextToDebug('$origin - $msg', FlxColor.RED);
 			}
 			return null;
 		}

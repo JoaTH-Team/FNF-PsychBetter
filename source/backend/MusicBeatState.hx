@@ -1,10 +1,10 @@
 package backend;
 
-import debug.DebugOverlay;
 import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
 import backend.PsychCamera;
+import psychlua.StateScriptHandler;
 
 class MusicBeatState extends FlxUIState
 {
@@ -24,13 +24,16 @@ class MusicBeatState extends FlxUIState
 
 	var _psychCameraInitialized:Bool = false;
 
-	private var debugOverlay:DebugOverlay;
+	function setScriptState(fileName:String, instance:FlxState)
+		return StateScriptHandler.setStateScript(instance, fileName);
 
 	override function create() {
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		#if MODS_ALLOWED Mods.updatedOnState = false; #end
 
 		if(!_psychCameraInitialized) initPsychCamera();
+
+		StateScriptHandler.callOnScripts("onCreate", []);
 
 		super.create();
 
@@ -39,6 +42,8 @@ class MusicBeatState extends FlxUIState
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
+
+		StateScriptHandler.callOnScripts("onCreatePost", []);
 	}
 
 	public function initPsychCamera():PsychCamera
@@ -57,6 +62,8 @@ class MusicBeatState extends FlxUIState
 		//everyStep();
 		var oldStep:Int = curStep;
 		timePassedOnState += elapsed;
+
+		StateScriptHandler.callOnScripts("onUpdate", [elapsed]);
 
 		updateCurStep();
 		updateBeat();
@@ -77,10 +84,16 @@ class MusicBeatState extends FlxUIState
 		if(FlxG.save.data != null) FlxG.save.data.fullscreen = FlxG.fullscreen;
 		
 		stagesFunc(function(stage:BaseStage) {
+			StateScriptHandler.callOnScripts("onStageUpdate", [elapsed]);
+
 			stage.update(elapsed);
+
+			StateScriptHandler.callOnScripts("onStageUpdatePost", [elapsed]);
 		});
 
 		super.update(elapsed);
+
+		StateScriptHandler.callOnScripts("onUpdatePost", [elapsed]);
 	}
 
 	private function updateSection():Void
@@ -169,34 +182,60 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
+		StateScriptHandler.callOnScripts("onStepHit", []);
+
 		stagesFunc(function(stage:BaseStage) {
+			StateScriptHandler.callOnScripts("onStageStepHit", []);
+
 			stage.curStep = curStep;
 			stage.curDecStep = curDecStep;
 			stage.stepHit();
+
+			StateScriptHandler.callOnScripts("onStageStepHitPost", []);
 		});
+
+		StateScriptHandler.setOnScripts("curStep", curStep);
+		StateScriptHandler.setOnScripts("curDecStep", curDecStep);
 
 		if (curStep % 4 == 0)
 			beatHit();
+
+		StateScriptHandler.callOnScripts("onStepHitPost", []);
 	}
 
 	public var stages:Array<BaseStage> = [];
 	public function beatHit():Void
 	{
-		//trace('Beat: ' + curBeat);
+		StateScriptHandler.callOnScripts("onBeatHit", []);
 		stagesFunc(function(stage:BaseStage) {
+			StateScriptHandler.callOnScripts("onStageBeatHit", []);
+
 			stage.curBeat = curBeat;
 			stage.curDecBeat = curDecBeat;
 			stage.beatHit();
+
+			StateScriptHandler.callOnScripts("onStageBeatHitPost", []);
 		});
+
+		StateScriptHandler.setOnScripts("curBeat", curBeat);
+		StateScriptHandler.setOnScripts("curDecBeat", curDecBeat);
+
+		StateScriptHandler.callOnScripts("onBeatHitPost", []);
 	}
 
 	public function sectionHit():Void
 	{
-		//trace('Section: ' + curSection + ', Beat: ' + curBeat + ', Step: ' + curStep);
+		StateScriptHandler.callOnScripts("onSectionHit", []);
 		stagesFunc(function(stage:BaseStage) {
+			StateScriptHandler.callOnScripts("onStageSectionHit", []);
 			stage.curSection = curSection;
 			stage.sectionHit();
+			StateScriptHandler.callOnScripts("onStageSectionHitPost", []);
 		});
+
+		StateScriptHandler.setOnScripts("curSection", curSection);
+
+		StateScriptHandler.callOnScripts("onSectionHitPost", []);
 	}
 
 	function stagesFunc(func:BaseStage->Void)

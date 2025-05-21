@@ -25,19 +25,25 @@ class TitleState extends MusicBeatState
 {
 	public static var initialized:Bool = false;
 
-	var blackScreen:FlxSprite;
-	var credGroup:FlxGroup;
-	var credTextShit:Alphabet;
-	var textGroup:FlxGroup;
-	var ngSpr:FlxSprite;
+	public var blackScreen:FlxSprite;
+	public var credGroup:FlxGroup;
+	public var credTextShit:Alphabet;
+	public var textGroup:FlxGroup;
+	public var ngSpr:FlxSprite;
 	
-	var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
-	var titleTextAlphas:Array<Float> = [1, .64];
+	public var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
+	public var titleTextAlphas:Array<Float> = [1, .64];
 
-	var curWacky:Array<String> = [];
-	var wackyImage:FlxSprite;
-	var skippedIntro:Bool = false;
-	var titleJSON:TitleData;
+	public var curWacky:Array<String> = [];
+	public var wackyImage:FlxSprite;
+	public var skippedIntro:Bool = false;
+	public var titleJSON:TitleData;
+
+	public function new() {
+		super();
+
+		setScriptState('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+	}
 
 	override public function create()
 	{
@@ -66,11 +72,11 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	var logoBl:FlxSprite;
-	var gfDance:FlxSprite;
-	var danceLeft:Bool = false;
-	var titleText:FlxSprite;
-	var swagShader:ColorSwap = null;
+	public var logoBl:FlxSprite;
+	public var gfDance:FlxSprite;
+	public var danceLeft:Bool = false;
+	public var titleText:FlxSprite;
+	public var swagShader:ColorSwap = null;
 
 	function startIntro()
 	{
@@ -174,9 +180,9 @@ class TitleState extends MusicBeatState
 		return [for (i in firstArray) i.split('--')];
 	}
 
-	var transitioning:Bool = false;
-	var newTitle:Bool = false;
-	var titleTimer:Float = 0;
+	public var transitioning:Bool = false;
+	public var newTitle:Bool = false;
+	public var titleTimer:Float = 0;
 
 	override function update(elapsed:Float)
 	{
@@ -269,6 +275,8 @@ class TitleState extends MusicBeatState
 	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
 	public static var closedState:Bool = false;
 
+	public var introSteps:Array<Dynamic>;
+
 	override function beatHit()
 	{
 		super.beatHit();
@@ -286,44 +294,41 @@ class TitleState extends MusicBeatState
 
 		if(!closedState) {
 			sickBeats++;
-			switch (sickBeats)
-			{
-				case 1:
-					//FlxG.sound.music.stop();
-					FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
-					FlxG.sound.music.fadeIn(4, 0, 0.7);
-				case 2:
-					createCoolText(['The', 'Funkin Crew Inc']);
-				case 4:
-					addMoreText('presents');
-				case 5:
-					deleteCoolText();
-				case 6:
-					createCoolText(['In association', 'with'], -40);
-				case 8:
-					addMoreText('newgrounds', -40);
-					ngSpr.visible = true;
-				case 9:
-					deleteCoolText();
-					ngSpr.visible = false;
-				case 10:
-					createCoolText([curWacky[0]]);
-				case 12:
-					addMoreText(curWacky[1]);
-				case 13:
-					deleteCoolText();
-				case 14:
-					addMoreText('Friday');
-				case 15:
-					// from vslice/base game:
-					// easter egg for when the game is trending with the wrong spelling
-					// the random intro text would be "trending--only on x"
-					if (curWacky[0] == "trending") addMoreText('Nigth');
-					else addMoreText('Night');
-				case 16:
-					addMoreText('Funkin');
-				case 17:
-					skipIntro();
+			if (introSteps == null) {
+				introSteps = [
+					{beat: 1, action: function() {
+						FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+						FlxG.sound.music.fadeIn(4, 0, 0.7);
+					}},
+					{beat: 2, action: function() createCoolText(['The', 'Funkin Crew Inc'])},
+					{beat: 4, action: function() addMoreText('presents')},
+					{beat: 5, action: function() deleteCoolText()},
+					{beat: 6, action: function() createCoolText(['In association', 'with'], -40)},
+					{beat: 8, action: function() {
+						addMoreText('newgrounds', -40);
+						ngSpr.visible = true;
+					}},
+					{beat: 9, action: function() {
+						deleteCoolText();
+						ngSpr.visible = false;
+					}},
+					{beat: 10, action: function() createCoolText([curWacky[0]])},
+					{beat: 12, action: function() addMoreText(curWacky[1])},
+					{beat: 13, action: function() deleteCoolText()},
+					{beat: 14, action: function() addMoreText('Friday')},
+					{beat: 15, action: function() {
+						if (curWacky[0] == "trending") addMoreText('Nigth');
+						else addMoreText('Night');
+					}},
+					{beat: 16, action: function() addMoreText('Funkin')},
+					{beat: 17, action: function() skipIntro()}
+				];
+			}
+
+			for (step in introSteps) {
+				if (sickBeats == step.beat) {
+					step.action();
+				}
 			}
 		}
 	}

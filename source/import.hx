@@ -60,3 +60,5 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 
 using StringTools;
 #end
+
+import Main.*;

@@ -48,7 +48,7 @@ class StateScriptHandler {
             var newScript:HScript = new HScript(null, file);
             if(newScript.parsingException != null)
             {
-                trace('ERROR ON LOADING: ${newScript.parsingException.message}', FlxColor.RED);
+                addTextToDebug('ERROR ON LOADING: ${newScript.parsingException.message}', FlxColor.RED);
                 newScript.destroy();
                 return;
             }
@@ -66,15 +66,15 @@ class StateScriptHandler {
                         {
                             var len:Int = e.message.indexOf('\n') + 1;
                             if(len <= 0) len = e.message.length;
-                                trace('ERROR ($file: onCreate) - ${e.message.substr(0, len)}', FlxColor.RED);
+                                addTextToDebug('ERROR ($file: onCreate) - ${e.message.substr(0, len)}', FlxColor.RED);
                         }
                     }
 
                     newScript.destroy();
                     hscript = null;
-                    trace('failed to initialize tea interp!!! ($file)');
+                    addTextToDebug('failed to initialize tea interp!!! ($file)');
                 }
-                else trace('initialized tea interp successfully: $file');
+                else addTextToDebug('initialized tea interp successfully: $file');
             }
 
         }
@@ -82,7 +82,7 @@ class StateScriptHandler {
         {
             var len:Int = e.message.indexOf('\n') + 1;
             if(len <= 0) len = e.message.length;
-            trace('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
+            addTextToDebug('ERROR - ' + e.message.substr(0, len), FlxColor.RED);
             if(hscript != null)
             {
                 hscript.destroy();
@@ -125,7 +125,7 @@ class StateScriptHandler {
                     {
                         var len:Int = e.message.indexOf('\n') + 1;
                         if(len <= 0) len = e.message.length;
-                        trace('ERROR (${callValue.calledFunction}) - ' + e.message.substr(0, len), FlxColor.RED);
+                        addTextToDebug('ERROR (${callValue.calledFunction}) - ' + e.message.substr(0, len), FlxColor.RED);
                     }
                 }
                 else

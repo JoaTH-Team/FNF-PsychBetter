@@ -1,5 +1,7 @@
 package;
 
+import psychlua.ScriptTraceHandler;
+import psychlua.HScript;
 #if android
 import android.content.Context;
 #end
@@ -50,6 +52,7 @@ class Main extends Sprite
 	};
 
 	public static var fpsVar:FPSCounter;
+	public static var scriptTraceVar:ScriptTraceHandler;
 
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
@@ -124,6 +127,11 @@ class Main extends Sprite
 		}
 		#end
 
+		scriptTraceVar = new ScriptTraceHandler();
+		Lib.current.stage.align = "tl";
+		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+		addChild(scriptTraceVar);
+
 		#if linux
 		var icon = Image.fromFile("icon.png");
 		Lib.current.stage.window.setIcon(icon);
@@ -197,4 +205,7 @@ class Main extends Sprite
 		Sys.exit(1);
 	}
 	#end
+
+	public static function addTextToDebug(text:String, ?color:FlxColor = FlxColor.WHITE):Void
+		scriptTraceVar.scriptTrace(Std.string(text), color);
 }

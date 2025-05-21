@@ -114,6 +114,10 @@ class HScript extends SScript
 		set('FlxAnimate', FlxAnimate);
 		#end
 
+		set('AudioDisplay', objects.AudioDisplay);
+		set('SpectralAnalyzer', funkin.vis.dsp.SpectralAnalyzer);
+		set('BGSprite', objects.BGSprite);
+
 		// Functions & Variables
 		set('setVar', function(name:String, value:Dynamic) {
 			PlayState.instance.variables.set(name, value);

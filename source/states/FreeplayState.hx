@@ -22,31 +22,39 @@ class FreeplayState extends MusicBeatState
 	var curDifficulty:Int = -1;
 	private static var lastDifficultyName:String = Difficulty.getDefault();
 
-	var scoreBG:FlxSprite;
-	var scoreText:FlxText;
-	var diffText:FlxText;
-	var lerpScore:Int = 0;
-	var lerpRating:Float = 0;
-	var intendedScore:Int = 0;
-	var intendedRating:Float = 0;
+	public var scoreBG:FlxSprite;
+	public var scoreText:FlxText;
+	public var diffText:FlxText;
+	public var lerpScore:Int = 0;
+	public var lerpRating:Float = 0;
+	public var intendedScore:Int = 0;
+	public var intendedRating:Float = 0;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
-	private var curPlaying:Bool = false;
+	public var curPlaying:Bool = false;
 
 	private var iconArray:Array<HealthIcon> = [];
 
-	var bg:FlxSprite;
-	var intendedColor:Int;
-	var colorTween:FlxTween;
+	public var bg:FlxSprite;
+	public var intendedColor:Int;
+	public var colorTween:FlxTween;
 
-	var missingTextBG:FlxSprite;
-	var missingText:FlxText;
+	public var missingTextBG:FlxSprite;
+	public var missingText:FlxText;
 
-	var bottomString:String;
-	var bottomText:FlxText;
-	var bottomBG:FlxSprite;
+	public var bottomString:String;
+	public var bottomText:FlxText;
+	public var bottomBG:FlxSprite;
 
-	var player:MusicPlayer;
+	public var player:MusicPlayer;
+
+    public function new() {
+        super();
+
+        #if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+        setScriptState('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+        #end
+    }
 
 	override function create()
 	{
@@ -180,6 +188,9 @@ class FreeplayState extends MusicBeatState
 		changeSelection(0, false);
 		persistentUpdate = true;
 		super.closeSubState();
+		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		StateScriptHandler.callOnScripts("onCloseSubState", []);
+		#end
 	}
 
 	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int)
@@ -187,20 +198,22 @@ class FreeplayState extends MusicBeatState
 		songs.push(new SongMetadata(songName, weekNum, songCharacter, color));
 	}
 
-	function weekIsLocked(name:String):Bool {
+	public function weekIsLocked(name:String):Bool {
 		var leWeek:WeekData = WeekData.weeksLoaded.get(name);
 		return (!leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
 	}
 
-	var instPlaying:Int = -1;
+	public var instPlaying:Int = -1;
 	public static var vocals:FlxSound = null;
-	var holdTime:Float = 0;
+	public var holdTime:Float = 0;
+	
 	override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music.volume < 0.7)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		}
+
 		lerpScore = Math.floor(FlxMath.lerp(intendedScore, lerpScore, Math.exp(-elapsed * 24)));
 		lerpRating = FlxMath.lerp(intendedRating, lerpRating, Math.exp(-elapsed * 12));
 
@@ -423,7 +436,7 @@ class FreeplayState extends MusicBeatState
 		vocals = null;
 	}
 
-	function changeDiff(change:Int = 0)
+	public function changeDiff(change:Int = 0)
 	{
 		if (player.playingMusic)
 			return;
@@ -449,9 +462,15 @@ class FreeplayState extends MusicBeatState
 		positionHighscore();
 		missingText.visible = false;
 		missingTextBG.visible = false;
+
+		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		StateScriptHandler.callOnScripts("onChangeDiff", []);
+		StateScriptHandler.setOnScripts("curDifficulty", curDifficulty);
+		StateScriptHandler.setOnScripts("lastDifficultyName", lastDifficultyName);
+		#end
 	}
 
-	function changeSelection(change:Int = 0, playSound:Bool = true)
+	public function changeSelection(change:Int = 0, playSound:Bool = true)
 	{
 		if (player.playingMusic)
 			return;
@@ -516,6 +535,11 @@ class FreeplayState extends MusicBeatState
 
 		changeDiff();
 		_updateSongLastDifficulty();
+
+		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		StateScriptHandler.callOnScripts("onChangeSelection", []);
+		StateScriptHandler.setOnScripts("curSelected", curSelected);
+		#end
 	}
 
 	inline private function _updateSongLastDifficulty()
@@ -556,16 +580,25 @@ class FreeplayState extends MusicBeatState
 			icon.visible = icon.active = true;
 			_lastVisibles.push(i);
 		}
+
+		#if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+		StateScriptHandler.callOnScripts("onUpdateText", [elapsed]);
+		#end
 	}
 
 	override function destroy():Void
 	{
-		super.destroy();
+        #if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+        StateScriptHandler.callOnScripts('onDestroy', []);
+        super.destroy();
+        #else
+        super.destroy();
+        #end
 
 		FlxG.autoPause = ClientPrefs.data.autoPause;
 		if (!FlxG.sound.music.playing)
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-	}	
+	}
 }
 
 class SongMetadata

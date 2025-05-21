@@ -1,5 +1,6 @@
 package backend;
 
+import psychlua.StateScriptHandler;
 import flixel.FlxSubState;
 
 class MusicBeatSubstate extends FlxSubState
@@ -25,13 +26,28 @@ class MusicBeatSubstate extends FlxSubState
 	inline function get_controls():Controls
 		return Controls.instance;
 
+	function setScriptState(fileName:String, instance:Dynamic)
+		return StateScriptHandler.setStateScript(instance, fileName);
+
 	override function create()
 	{
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onCreate', []);
+		#end
+
 		super.create();
+
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onCreatePost', []);
+		#end
 	}
 
 	override function update(elapsed:Float)
 	{
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onUpdate', [elapsed]);
+		#end
+
 		//everyStep();
 		if(!persistentUpdate) MusicBeatState.timePassedOnState += elapsed;
 		var oldStep:Int = curStep;
@@ -54,6 +70,10 @@ class MusicBeatSubstate extends FlxSubState
 		}
 
 		super.update(elapsed);
+
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onUpdatePost', [elapsed]);
+		#end
 	}
 
 	private function updateSection():Void
@@ -106,18 +126,37 @@ class MusicBeatSubstate extends FlxSubState
 
 	public function stepHit():Void
 	{
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onStepHit', []);
+		StateScriptHandler.setOnScripts('curStep', curStep);
+		StateScriptHandler.setOnScripts('curDecStep', curDecStep);
+		#end
+
 		if (curStep % 4 == 0)
 			beatHit();
+
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onStepHitPost', []);
+		#end
 	}
 
 	public function beatHit():Void
 	{
-		//do literally nothing dumbass
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onBeatHit', []);
+		StateScriptHandler.setOnScripts('curBeat', curBeat);
+		StateScriptHandler.setOnScripts('curDecBeat', curDecBeat);
+		StateScriptHandler.callOnScripts('onBeatHitPost', []);
+		#end
 	}
 	
 	public function sectionHit():Void
 	{
-		//yep, you guessed it, nothing again, dumbass
+		#if HSCRIPT_ALLOWED
+		StateScriptHandler.callOnScripts('onSectionHit', []);
+		StateScriptHandler.setOnScripts('curSection', curSection);
+		StateScriptHandler.callOnScripts('onSectionHitPost', []);
+		#end
 	}
 	
 	function getBeatsOnSection()

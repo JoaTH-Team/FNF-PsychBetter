@@ -1,14 +1,12 @@
 package psychlua;
 
-import flixel.FlxState;
-
 class StateScriptHandler {
     #if HSCRIPT_ALLOWED
     public static var hscript:HScript;
     public static var instancesExclude:Array<String> = [];
     #end
 
-    public static function setStateScript(state:FlxState, fileName:String):Void {
+    public static function setStateScript(state:Dynamic, fileName:String):Void {
         #if HSCRIPT_ALLOWED
         if(hscript != null)
         {

@@ -1,5 +1,6 @@
 package substates;
 
+import psychlua.StateScriptHandler;
 import backend.WeekData;
 
 import objects.Character;
@@ -12,11 +13,11 @@ import states.FreeplayState;
 class GameOverSubstate extends MusicBeatSubstate
 {
 	public var boyfriend:Character;
-	var camFollow:FlxObject;
-	var moveCamera:Bool = false;
-	var playingDeathSound:Bool = false;
+	public var camFollow:FlxObject;
+	public var moveCamera:Bool = false;
+	public var playingDeathSound:Bool = false;
 
-	var stageSuffix:String = "";
+	public var stageSuffix:String = "";
 
 	public static var characterName:String = 'bf-dead';
 	public static var deathSoundName:String = 'fnf_loss_sfx';
@@ -24,6 +25,14 @@ class GameOverSubstate extends MusicBeatSubstate
 	public static var endSoundName:String = 'gameOverEnd';
 
 	public static var instance:GameOverSubstate;
+
+	public function new() {
+		super();
+
+        #if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+        setScriptState('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+        #end
+	}
 
 	public static function resetVariables() {
 		characterName = 'bf-dead';
@@ -41,8 +50,8 @@ class GameOverSubstate extends MusicBeatSubstate
 		}
 	}
 
-	var charX:Float = 0;
-	var charY:Float = 0;
+	public var charX:Float = 0;
+	public var charY:Float = 0;
 	override function create()
 	{
 		instance = this;
@@ -65,8 +74,11 @@ class GameOverSubstate extends MusicBeatSubstate
 		FlxG.camera.focusOn(new FlxPoint(FlxG.camera.scroll.x + (FlxG.camera.width / 2), FlxG.camera.scroll.y + (FlxG.camera.height / 2)));
 		add(camFollow);
 		
-		PlayState.instance.setOnScripts('inGameOver', true);
-		PlayState.instance.callOnScripts('onGameOverStart', []);
+		if (PlayState.instance != null) PlayState.instance.setOnScripts('inGameOver', true);
+		else StateScriptHandler.setOnScripts('inGameOver', true);
+		
+		if (PlayState.instance != null) PlayState.instance.callOnScripts('onGameOverStart', []);
+		else StateScriptHandler.callOnScripts('onGameOverStart', []);
 
 		super.create();
 	}
@@ -75,8 +87,6 @@ class GameOverSubstate extends MusicBeatSubstate
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-
-		PlayState.instance.callOnScripts('onUpdate', [elapsed]);
 
 		if (controls.ACCEPT)
 		{
@@ -98,7 +108,8 @@ class GameOverSubstate extends MusicBeatSubstate
 				MusicBeatState.switchState(new FreeplayState());
 
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			PlayState.instance.callOnScripts('onGameOverConfirm', [false]);
+			if (PlayState.instance != null) PlayState.instance.callOnScripts('onGameOverConfirm', [false]);
+			else StateScriptHandler.callOnScripts('onGameOverConfirm', [false]);
 		}
 		
 		if (boyfriend.animation.curAnim != null)
@@ -141,17 +152,16 @@ class GameOverSubstate extends MusicBeatSubstate
 		{
 			Conductor.songPosition = FlxG.sound.music.time;
 		}
-		PlayState.instance.callOnScripts('onUpdatePost', [elapsed]);
 	}
 
-	var isEnding:Bool = false;
+	public var isEnding:Bool = false;
 
-	function coolStartDeath(?volume:Float = 1):Void
+	public function coolStartDeath(?volume:Float = 1):Void
 	{
 		FlxG.sound.playMusic(Paths.music(loopSoundName), volume);
 	}
 
-	function endBullshit():Void
+	public function endBullshit():Void
 	{
 		if (!isEnding)
 		{
@@ -166,7 +176,8 @@ class GameOverSubstate extends MusicBeatSubstate
 					MusicBeatState.resetState();
 				});
 			});
-			PlayState.instance.callOnScripts('onGameOverConfirm', [true]);
+			if (PlayState.instance != null) PlayState.instance.callOnScripts('onGameOverConfirm', [true]);
+			else StateScriptHandler.callOnScripts('onGameOverConfirm', [true]);
 		}
 	}
 

@@ -8,14 +8,24 @@ import flixel.addons.transition.FlxTransitionableState;
 
 class FlashingState extends MusicBeatState
 {
+    public function new() {
+        super();
+
+        #if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+        setScriptState('${Type.getClassName(Type.getClass(this)).split('.').pop()}', this);
+        #end
+    }
+
 	public static var leftState:Bool = false;
 
-	var warnText:FlxText;
+	public var warnText:FlxText;
+	public var bg:FlxSprite;
+
 	override function create()
 	{
 		super.create();
 
-		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		bg = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(bg);
 
 		warnText = new FlxText(0, 0, FlxG.width,
@@ -58,5 +68,15 @@ class FlashingState extends MusicBeatState
 			}
 		}
 		super.update(elapsed);
+	}
+
+	override function destroy():Void
+	{
+        #if (LUA_ALLOWED || HSCRIPT_ALLOWED)
+        StateScriptHandler.callOnScripts('onDestroy', []);
+        super.destroy();
+        #else
+        super.destroy();
+        #end
 	}
 }

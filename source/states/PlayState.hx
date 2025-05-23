@@ -680,6 +680,9 @@ class PlayState extends MusicBeatState
 		playbackRate = value;
 		FlxG.animationTimeScale = value;
 		Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * value;
+		#if VIDEOS_ALLOWED
+		if(videoCutscene != null) videoCutscene.rate = value;
+		#end
 		setOnScripts('playbackRate', playbackRate);
 		#else
 		playbackRate = 1.0; // ensuring -Crow
@@ -831,7 +834,7 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		var videoCutscene = new VideoHandler();
+		videoCutscene = new VideoHandler();
 			#if (hxCodec >= "3.0.0")
 			// Recent versions
 			videoCutscene.play(filepath);

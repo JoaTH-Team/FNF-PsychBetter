@@ -114,9 +114,10 @@ class HScript extends SScript
 		#if flxanimate
 		set('FlxAnimate', FlxAnimate);
 		#end
-		set('FlxVideo', hxvlc.flixel.FlxVideo);
-		set('FlxVideoSprite', hxvlc.flixel.FlxVideoSprite);
 
+		set('VideoHandler', #if (hxCodec >= "3.0.0") hxcodec.flixel.FlxVideo #elseif (hxCodec >= "2.6.1") hxcodec.VideoHandler #elseif (hxCodec == "2.6.0") VideoHandler #else vlc.MP4Handler #end);
+		set('FlxVideo', #if (hxCodec >= "3.0.0") hxcodec.flixel.FlxVideo #elseif (hxCodec >= "2.6.1") hxcodec.FlxVideo #elseif (hxCodec == "2.6.0") FlxVideo #else vlc.FlxVideo #end);
+		
 		set('AudioDisplay', objects.AudioDisplay);
 		set('SpectralAnalyzer', funkin.vis.dsp.SpectralAnalyzer);
 		set('BGSprite', objects.BGSprite);

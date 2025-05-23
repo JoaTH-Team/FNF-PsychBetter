@@ -90,7 +90,7 @@
 	<!-- Psych stuff needed -->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED" version="git"/>
 	<haxelib name="SScript" if="HSCRIPT_ALLOWED" version="7.7.0"/>
-	<haxelib name="hxvlc" if="VIDEOS_ALLOWED" version="2.0.1"/>
+	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" version="3.0.2"/>
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED" version="git"/>
 	<haxelib name="flxanimate" version="git"/>
 	<haxelib name="funkin.vis" version="git"/>

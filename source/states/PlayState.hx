@@ -32,12 +32,18 @@ import states.editors.CharacterEditorState;
 import substates.PauseSubState;
 import substates.GameOverSubstate;
 
+#if VIDEOS_ALLOWED
+#if (hxCodec >= "3.0.0") import hxcodec.flixel.FlxVideo as VideoHandler;
+#elseif (hxCodec >= "2.6.1") import hxcodec.VideoHandler as VideoHandler;
+#elseif (hxCodec == "2.6.0") import VideoHandler;
+#else import vlc.MP4Handler as VideoHandler; #end
+#end
+
 #if !flash
 import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 #end
 
-import objects.VideoSprite;
 import objects.Note.EventNote;
 import objects.*;
 import states.stages.objects.*;
@@ -674,9 +680,6 @@ class PlayState extends MusicBeatState
 		playbackRate = value;
 		FlxG.animationTimeScale = value;
 		Conductor.safeZoneOffset = (ClientPrefs.data.safeFrames / 60) * 1000 * value;
-		#if VIDEOS_ALLOWED
-		if(videoCutscene != null && videoCutscene.videoSprite != null) videoCutscene.videoSprite.bitmap.rate = value;
-		#end
 		setOnScripts('playbackRate', playbackRate);
 		#else
 		playbackRate = 1.0; // ensuring -Crow
@@ -810,63 +813,48 @@ class PlayState extends MusicBeatState
 		char.y += char.positionArray[1];
 	}
 
-	public var videoCutscene:VideoSprite = null;
-	public function startVideo(name:String, forMidSong:Bool = false, canSkip:Bool = true, loop:Bool = false, playOnLoad:Bool = true)
+	public var videoCutscene:VideoHandler = null;
+	public function startVideo(name:String)
 	{
 		#if VIDEOS_ALLOWED
-		inCutscene = !forMidSong;
-		canPause = forMidSong;
+		inCutscene = true;
 
-		var foundFile:Bool = false;
-		var fileName:String = Paths.video(name);
-
+		var filepath:String = Paths.video(name);
 		#if sys
-		if (FileSystem.exists(fileName))
+		if(!FileSystem.exists(filepath))
 		#else
-		if (OpenFlAssets.exists(fileName))
+		if(!OpenFlAssets.exists(filepath))
 		#end
-		foundFile = true;
-
-		if (foundFile)
 		{
-			videoCutscene = new VideoSprite(fileName, forMidSong, canSkip, loop);
-			if(forMidSong) videoCutscene.videoSprite.bitmap.rate = playbackRate;
-
-			if (!forMidSong)
-			{
-				function onVideoEnd()
-				{
-					if (!isDead && generatedMusic && PlayState.SONG.notes[Std.int(curStep / 16)] != null && !endingSong && !isCameraOnForcedPos)
-					{
-						moveCameraSection();
-						FlxG.camera.snapToTarget();
-					}
-					videoCutscene = null;
-					canPause = true;
-					inCutscene = false;
-					startAndEnd();
-				}
-				videoCutscene.finishCallback = onVideoEnd;
-				videoCutscene.onSkip = onVideoEnd;
-			}
-			if (GameOverSubstate.instance != null && isDead) GameOverSubstate.instance.add(videoCutscene);
-			else add(videoCutscene);
-
-			if (playOnLoad)
-				videoCutscene.play();
-			return videoCutscene;
+			FlxG.log.warn('Couldnt find video file: ' + name);
+			startAndEnd();
+			return;
 		}
-		#if HSCRIPT_ALLOWED
-		else addTextToDebug("Video not found: " + fileName, FlxColor.RED);
-		#else
-		else FlxG.log.error("Video not found: " + fileName);
-		#end
+
+		var videoCutscene = new VideoHandler();
+			#if (hxCodec >= "3.0.0")
+			// Recent versions
+			videoCutscene.play(filepath);
+			videoCutscene.onEndReached.add(function()
+			{
+				videoCutscene.dispose();
+				startAndEnd();
+				return;
+			}, true);
+			#else
+			// Older versions
+			videoCutscene.playVideo(filepath);
+			videoCutscene.finishCallback = function()
+			{
+				startAndEnd();
+				return;
+			}
+			#end
 		#else
 		FlxG.log.warn('Platform not supported!');
 		startAndEnd();
 		return;
 		#end
-		return null;
 	}
 
 	function startAndEnd()

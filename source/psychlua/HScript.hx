@@ -114,6 +114,8 @@ class HScript extends SScript
 		#if flxanimate
 		set('FlxAnimate', FlxAnimate);
 		#end
+		set('FlxVideo', hxvlc.flixel.FlxVideo);
+		set('FlxVideoSprite', hxvlc.flixel.FlxVideoSprite);
 
 		set('AudioDisplay', objects.AudioDisplay);
 		set('SpectralAnalyzer', funkin.vis.dsp.SpectralAnalyzer);
